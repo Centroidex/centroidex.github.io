@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EI-2.2 · Viga con carga distribuida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+  // MathJax: fórmulas dibujadas como SVG (no necesita fuentes externas).
+  window.MathJax = { tex: {}, svg: { fontCache: "none" }, startup: { typeset: false } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
+<style>
+/* Concepto: hoja de cálculo de ingeniería en papel claro. Arriba los controles; a la izquierda
+   la viga y sus diagramas con una misma escala horizontal; a la derecha el cálculo paso a paso.
+   Diseño de un solo tema (claro), por petición del profesor: se ve igual en cualquier pantalla y proyector. */
+:root {
+  color-scheme: light;
+  --papel: #f6f8fb;        /* fondo de la página */
+  --hoja: #ffffff;         /* tarjetas */
+  --tinta: #1f2a37;        /* texto principal */
+  --tinta-2: #5b6b7d;      /* texto secundario */
+  --reticula: #e4eaf2;     /* líneas finas, ejes */
+  --borde: #d6dee9;
+  --viga: #9fb2c8;         /* acero de la viga */
+  --carga: #a3303c;        /* carga aplicada (tinto) */
+  --carga-suave: #f7e1e3;
+  --reaccion: #2b8a7e;     /* reacciones */
+  --reaccion-suave: #dcf1ed;
+  --cortante: #3a7cc0;     /* diagrama de cortante */
+  --cortante-suave: #d9e9f8;
+  --momento: #5b9a4f;      /* diagrama de momento */
+  --momento-suave: #dff0d9;
+  --foco: #7c5cc4;
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+body { background: var(--papel); color: var(--tinta); font: 16px/1.5 var(--f-texto); }
+.pagina {
+  max-width: 1240px; margin: 0 auto;
+  padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 16px;
+}
+header { display: grid; gap: 4px; }
+.materia { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); font-weight: 700; }
+h1 { font-size: clamp(24px, 3.2vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.indicacion { margin: 0; color: var(--tinta-2); max-width: 70ch; }
+
+/* ---------- controles ---------- */
+.controles {
+  background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px;
+  padding: 14px 16px; display: grid; gap: 14px 24px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.control { display: grid; gap: 6px; min-width: 0; }
+.control-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.control label { font-weight: 700; font-size: 15px; }
+.control label .sim { font-style: italic; font-weight: 400; color: var(--tinta-2); }
+.valor { display: inline-flex; align-items: baseline; gap: 4px; }
+.valor input {
+  width: 6.2em; font: 500 15px var(--f-num); text-align: right; color: var(--tinta);
+  border: 1px solid var(--borde); border-radius: 6px; padding: 3px 6px; background: var(--papel);
+  font-variant-numeric: tabular-nums;
+}
+.valor span { font-size: 14px; color: var(--tinta-2); }
+input[type="range"] { width: 100%; accent-color: var(--tinta); height: 26px; }
+#c-w input[type="range"], #c-x1 input[type="range"], #c-x2 input[type="range"] { accent-color: var(--carga); }
+input:focus-visible, button:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.opciones { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 14px; color: var(--tinta-2); }
+.opciones label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+
+/* ---------- cuerpo ---------- */
+.cuerpo { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+.tarjeta { background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px; padding: 12px 14px 8px; min-width: 0; }
+.tarjeta h2 { font-size: 15px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; }
+.tarjeta h2 .muestra { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.figuras { display: grid; gap: 10px; }
+svg.dibujo { width: 100%; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+svg text { font-family: var(--f-texto); fill: var(--tinta); }
+svg .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.lectura {
+  font: 14px var(--f-num); color: var(--tinta-2); min-height: 1.5em; margin: 2px 2px 4px;
+  font-variant-numeric: tabular-nums;
+}
+.lectura b { color: var(--tinta); font-weight: 500; }
+
+/* ---------- cálculo paso a paso ---------- */
+.pasos { display: grid; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .pasos { position: static; } }
+.paso { padding: 8px 0 10px; border-top: 1px solid var(--reticula); min-width: 0; }
+.paso:first-of-type { border-top: 0; }
+.paso h3 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); margin: 0 0 4px; }
+.paso p { margin: 2px 0 4px; font-size: 15px; }
+.ec { overflow-x: auto; overflow-y: hidden; padding: 2px 0; display: grid; gap: 2px; justify-items: start; min-width: 0; }
+.ec .linea { font-size: 17px; line-height: 1; padding: 3px 2px; }
+.ec .linea mjx-container { margin: 0 !important; position: relative; }
+/* respaldo por si la hoja de estilos de MathJax tarda: la versión accesible queda oculta a la vista */
+mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0 !important; border: 0 !important; height: 1px !important; width: 1px !important; overflow: hidden !important; display: block !important; user-select: none; }
+.ec .linea mjx-container svg { max-width: none; }
+.ec .linea.fin { background: var(--reaccion-suave); border-radius: 6px; padding: 4px 8px; }
+.ec .linea.fin.m { background: var(--momento-suave); }
+.ec .linea.fin.v { background: var(--cortante-suave); }
+.nota { font-size: 13px; color: var(--tinta-2); margin: 0; }
+@media (max-width: 520px) { .ec .linea { font-size: 15px; } }
+</style>
+
+<nav style="max-width: 980px; margin: 0 auto; padding: 12px 16px 0; font-family: 'Atkinson Hyperlegible', Arial, sans-serif; font-size: 15px"><a href="ei-2-2.html" style="color:#2f5d9b; font-weight:700; text-decoration:none">← Volver al tema EI-2.2</a> · <a href="index.html" style="color:#2f5d9b; text-decoration:none">Inicio</a></nav>
+<div class="pagina">
+  <header>
+    <span class="materia">Estructuras isostáticas</span>
+    <h1>Viga simplemente apoyada con carga uniforme distribuida</h1>
+    <p class="indicacion">Elige dónde empieza y dónde termina la carga y su intensidad. En la viga puedes arrastrar el bloque de carga completo o estirarlo desde sus extremos. Las reacciones, los diagramas y el cálculo se actualizan al instante.</p>
+  </header>
+
+  <section class="controles" aria-label="Datos de la viga">
+    <div class="control" id="c-L">
+      <div class="control-fila">
+        <label for="L">Claro <span class="sim">L</span></label>
+        <span class="valor"><input id="L-num" type="number" min="2" max="12" step="0.1" aria-label="Claro en metros"><span>m</span></span>
+      </div>
+      <input id="L" type="range" min="2" max="12" step="0.1">
+    </div>
+    <div class="control" id="c-w">
+      <div class="control-fila">
+        <label for="w">Intensidad <span class="sim">w</span></label>
+        <span class="valor"><input id="w-num" type="number" min="0" max="5000" step="50" aria-label="Intensidad de la carga en kgf por metro"><span>kgf/m</span></span>
+      </div>
+      <input id="w" type="range" min="0" max="5000" step="50">
+    </div>
+    <div class="control" id="c-x1">
+      <div class="control-fila">
+        <label for="x1">Inicio <span class="sim">x₁</span> (desde A)</label>
+        <span class="valor"><input id="x1-num" type="number" min="0" step="0.05" aria-label="Inicio de la carga en metros"><span>m</span></span>
+      </div>
+      <input id="x1" type="range" min="0" step="0.05">
+    </div>
+    <div class="control" id="c-x2">
+      <div class="control-fila">
+        <label for="x2">Final <span class="sim">x₂</span> (desde A)</label>
+        <span class="valor"><input id="x2-num" type="number" min="0" step="0.05" aria-label="Final de la carga en metros"><span>m</span></span>
+      </div>
+      <input id="x2" type="range" min="0" step="0.05">
+    </div>
+    <div class="opciones">
+      <label><input type="checkbox" id="resultante" checked> Mostrar la resultante <i>W</i></label>
+      <label><input type="checkbox" id="tension"> Dibujar el momento del lado de tensión (abajo)</label>
+    </div>
+  </section>
+
+  <div class="cuerpo">
+    <section class="figuras" aria-label="Viga y diagramas">
+      <div class="tarjeta">
+        <h2>Viga y reacciones</h2>
+        <svg class="dibujo" id="svg-viga" viewBox="0 0 800 250" role="img" aria-label="Viga con la carga distribuida y las reacciones"></svg>
+      </div>
+      <div class="tarjeta">
+        <h2><span class="muestra" style="background:var(--cortante-suave);border:1.5px solid var(--cortante)"></span>Diagrama de fuerza cortante <span class="sim" style="font-weight:400;color:var(--tinta-2)">V (kgf)</span></h2>
+        <svg class="dibujo" id="svg-V" viewBox="0 0 800 190" role="img" aria-label="Diagrama de fuerza cortante"></svg>
+      </div>
+      <div class="tarjeta">
+        <h2><span class="muestra" style="background:var(--momento-suave);border:1.5px solid var(--momento)"></span>Diagrama de momento flexionante <span class="sim" style="font-weight:400;color:var(--tinta-2)">M (kgf·m)</span></h2>
+        <svg class="dibujo" id="svg-M" viewBox="0 0 800 190" role="img" aria-label="Diagrama de momento flexionante"></svg>
+        <p class="lectura" id="lectura" aria-live="polite">Pasa el cursor o el dedo sobre los diagramas para leer V y M en cualquier sección.</p>
+      </div>
+    </section>
+
+    <aside class="tarjeta pasos" aria-label="Cálculo paso a paso">
+      <div class="paso"><h3>Datos</h3><div class="ec" id="e-datos"></div></div>
+      <div class="paso">
+        <h3>1 · Resultante de la carga</h3>
+        <p>La carga uniforme equivale a una fuerza en el centro de su tramo:</p>
+        <div class="ec" id="e-W"></div>
+      </div>
+      <div class="paso">
+        <h3>2 · Reacción en B</h3>
+        <p>Suma de momentos respecto al apoyo A:</p>
+        <div class="ec" id="e-RB"></div>
+      </div>
+      <div class="paso">
+        <h3>3 · Reacción en A</h3>
+        <p>Suma de fuerzas verticales:</p>
+        <div class="ec" id="e-RA"></div>
+      </div>
+      <div class="paso">
+        <h3>4 · Fuerza cortante por tramos</h3>
+        <div class="ec" id="e-V"></div>
+      </div>
+      <div class="paso">
+        <h3>5 · Momento máximo (donde V = 0)</h3>
+        <div class="ec" id="e-M"></div>
+      </div>
+      <div class="paso">
+        <h3>Sección en <i>x</i></h3>
+        <div class="ec" id="e-x"></div>
+        <p class="nota">Convención: cortante positivo hacia arriba en la cara izquierda; momento positivo cuando comprime la fibra superior.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ---------------- estado y utilidades ----------------
+  const estado = { L: 6, w: 1500, x1: 1.5, x2: 4.5, x: null, tension: false, resultante: true };
+  const LMIN = 0.1;                                            // longitud mínima del tramo cargado (m)
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmt = (v, d = 0) => {
+    const s = Math.abs(v) < 1e-9 ? 0 : v;
+    return s.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/,/g, "\u202F").replace("-", "\u2212");
+  };
+  const dec = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? 0 : Math.abs(v * 10 - Math.round(v * 10)) < 1e-9 ? 1 : 2);
+  const fm = (v) => fmt(v, dec(v));
+  const tex = (v, d = 0) => fmt(v, d).replace(/\u202F/g, "\\,").replace("\u2212", "-");
+  const texm = (v) => tex(v, dec(v));
+
+  // ---------------- mecánica (única fuente de los números) ----------------
+  function resolver({ L, w, x1, x2 }) {
+    const l = x2 - x1;                 // longitud cargada
+    const W = w * l;                   // resultante
+    const c = (x1 + x2) / 2;           // posición de la resultante desde A
+    const RB = (W * c) / L;
+    const RA = W - RB;
+    const V = (x) => (x <= x1 ? RA : x >= x2 ? RA - W : RA - w * (x - x1));
+    const M = (x) => (x <= x1 ? RA * x : x >= x2 ? RB * (L - x) : RA * x - (w * (x - x1) ** 2) / 2);
+    const x0 = w > 0 && l > 0 ? x1 + RA / w : null;           // donde V = 0 (siempre dentro del tramo cargado)
+    const Mmax = x0 === null ? 0 : M(x0);
+    return { L, w, x1, x2, l, W, c, RA, RB, V, M, x0, Mmax };
+  }
+
+  // ---------------- escala horizontal compartida ----------------
+  let W_ = 800, X0 = 70, X1 = 730;
+  function medir() {
+    const ancho = $("svg-V").getBoundingClientRect().width || 800;
+    W_ = ancho < 600 ? 480 : 800; X0 = W_ < 800 ? 46 : 70; X1 = W_ - (W_ < 800 ? 46 : 70);
+    for (const [id, h] of [["svg-viga", 250], ["svg-V", 190], ["svg-M", 190]]) $(id).setAttribute("viewBox", `0 0 ${W_} ${h}`);
+  }
+  const sx = (x) => X0 + (x / estado.L) * (X1 - X0);
+  const xDesdePantalla = (svg, clientX) => {
+    const r = svg.getBoundingClientRect();
+    const vx = ((clientX - r.left) / r.width) * W_;
+    return ((vx - X0) / (X1 - X0)) * estado.L;
+  };
+  const el = (tag, attrs = {}, padre) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    if (padre) padre.appendChild(n);
+    return n;
+  };
+  const texto = (padre, x, y, t, attrs = {}) => { const n = el("text", { x, y, ...attrs }, padre); n.textContent = t; return n; };
+  const flecha = (padre, x1, y1, x2, y2, color, ancho = 3, punta = 12, abre = 7, extra = {}) => {
+    el("line", { x1, y1, x2, y2, stroke: color, "stroke-width": ancho, "stroke-linecap": "round", ...extra }, padre);
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const p = [[x2, y2], [x2 - punta * Math.cos(ang) + abre * Math.sin(ang), y2 - punta * Math.sin(ang) - abre * Math.cos(ang)],
+               [x2 - punta * Math.cos(ang) - abre * Math.sin(ang), y2 - punta * Math.sin(ang) + abre * Math.cos(ang)]];
+    el("polygon", { points: p.map((q) => q.join(",")).join(" "), fill: color }, padre);
+  };
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  function etiqueta(padre, x, y, html, color, { ancla = "middle", tam = 15, relleno = "#fff" } = {}) {
+    const g = el("g", {}, padre);
+    const t = el("text", { x, y, "text-anchor": ancla, "dominant-baseline": "central", "font-size": tam, "font-weight": 700, fill: color }, g);
+    t.innerHTML = html;
+    const b = t.getBBox();
+    const r = el("rect", { x: b.x - 8, y: b.y - 4, width: b.width + 16, height: b.height + 8, rx: (b.height + 8) / 2, fill: relleno, stroke: color, "stroke-width": 1.3 }, null);
+    g.insertBefore(r, t);
+    return g;
+  }
+  function definiciones(svg) {
+    const d = el("defs", {}, svg);
+    d.innerHTML = `
+      <linearGradient id="g-viga" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#dbe4ee"/><stop offset=".45" stop-color="#b9c9da"/><stop offset="1" stop-color="#8ea4bc"/>
+      </linearGradient>
+      <linearGradient id="g-apoyo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe6ef"/>
+      </linearGradient>
+      <linearGradient id="g-terreno" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#efe7da"/><stop offset="1" stop-color="#f8f4ee" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="g-carga" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${css("--carga-suave")}" stop-opacity="1"/><stop offset="1" stop-color="${css("--carga-suave")}" stop-opacity=".25"/>
+      </linearGradient>
+      <pattern id="p-achurado" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" stroke="#b7a68c" stroke-width="1.2"/>
+      </pattern>
+      <filter id="f-sombra" x="-5%" y="-40%" width="110%" height="200%">
+        <feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#1f2a37" flood-opacity=".18"/>
+      </filter>`;
+  }
+  function terreno(svg, xc, y, ancho, C) {
+    el("rect", { x: xc - ancho / 2, y, width: ancho, height: 14, fill: "url(#g-terreno)" }, svg);
+    el("rect", { x: xc - ancho / 2, y, width: ancho, height: 9, fill: "url(#p-achurado)" }, svg);
+    el("line", { x1: xc - ancho / 2, y1: y, x2: xc + ancho / 2, y2: y, stroke: C.tinta, "stroke-width": 1.6, "stroke-linecap": "round" }, svg);
+  }
+  function insignia(svg, x, y, letra, C) {
+    el("circle", { cx: x, cy: y, r: 12, fill: "#fff", stroke: C.tinta, "stroke-width": 1.3 }, svg);
+    texto(svg, x, y + 5, letra, { "text-anchor": "middle", "font-size": 14, "font-weight": 700, "font-style": "italic" });
+  }
+  function asa(padre, x, y, C) {
+    el("circle", { cx: x, cy: y, r: 9, fill: C.cargaS, stroke: C.carga, "stroke-width": 2 }, padre);
+    el("circle", { cx: x, cy: y, r: 3.2, fill: C.carga }, padre);
+  }
+  function arrastrable(g, svg, alMover) {
+    g.addEventListener("pointerdown", (ev) => {
+      ev.stopPropagation();
+      g.setPointerCapture(ev.pointerId);
+      const x0 = xDesdePantalla(svg, ev.clientX);
+      const ini = { x1: estado.x1, x2: estado.x2 };
+      const mover = (e) => alMover(xDesdePantalla(svg, e.clientX), x0, ini);
+      const soltar = () => g.removeEventListener("pointermove", mover);
+      g.addEventListener("pointermove", mover);
+      g.addEventListener("pointerup", soltar, { once: true });
+      g.addEventListener("pointercancel", soltar, { once: true });
+    });
+  }
+  const paso = (v) => Math.round(v / 0.05) * 0.05;
+
+  // ---------------- viga ----------------
+  function dibujarViga(s) {
+    const svg = $("svg-viga"); svg.textContent = "";
+    const C = { carga: css("--carga"), cargaS: css("--carga-suave"), reac: css("--reaccion"), tinta: css("--tinta"), t2: css("--tinta-2") };
+    definiciones(svg);
+    cursor(svg, 0, 250);
+    const yv = 104, hv = 18, ys = yv + hv / 2, yTop = yv - hv / 2;
+    const hApoyo = 24, yT = ys + hApoyo + 2;
+
+    // apoyos
+    terreno(svg, X0, yT, 58, C);
+    el("polygon", { points: `${X0},${ys + 3} ${X0 - 15},${yT} ${X0 + 15},${yT}`, fill: "url(#g-apoyo)", stroke: C.tinta, "stroke-width": 1.4, "stroke-linejoin": "round" }, svg);
+    terreno(svg, X1, yT, 58, C);
+    el("polygon", { points: `${X1},${ys + 3} ${X1 - 15},${yT - 9} ${X1 + 15},${yT - 9}`, fill: "url(#g-apoyo)", stroke: C.tinta, "stroke-width": 1.4, "stroke-linejoin": "round" }, svg);
+    for (const dx of [-8, 0, 8]) el("circle", { cx: X1 + dx, cy: yT - 4.5, r: 4, fill: "#fff", stroke: C.tinta, "stroke-width": 1.2 }, svg);
+
+    // viga con volumen
+    const gv = el("g", { filter: "url(#f-sombra)" }, svg);
+    el("rect", { x: X0 - 8, y: yTop, width: X1 - X0 + 16, height: hv, rx: 2.5, fill: "url(#g-viga)", stroke: C.tinta, "stroke-width": 1.2 }, gv);
+    el("line", { x1: X0 - 7, y1: yTop + 3.5, x2: X1 + 7, y2: yTop + 3.5, stroke: "#ffffff", "stroke-width": 1.2, opacity: .8 }, svg);
+    el("line", { x1: X0 - 7, y1: ys - 3.5, x2: X1 + 7, y2: ys - 3.5, stroke: "#6f86a0", "stroke-width": 1, opacity: .7 }, svg);
+    for (const x of [X0, X1]) el("circle", { cx: x, cy: ys + 3, r: 4.2, fill: "#fff", stroke: C.tinta, "stroke-width": 1.4 }, svg);
+    insignia(svg, X0 - 30, yv, "A", C);
+    insignia(svg, X1 + 30, yv, "B", C);
+
+    // reacciones
+    const ref = Math.max(s.w * s.L / 2, 1);
+    const largo = (R) => 16 + 38 * Math.min(1, R / ref);
+    const yBase = yT + 16;
+    [[X0, s.RA, "A"], [X1, s.RB, "B"]].forEach(([x, R, sub], i) => {
+      if (R > 1e-9) flecha(svg, x, yBase + largo(R), x, yBase, C.reac, 3.5);
+      etiqueta(svg, x + (i === 0 ? 16 : -16), yBase + Math.max(largo(R), 22) - 6,
+        `<tspan font-style="italic">R</tspan><tspan font-size="10.5" dy="4">${sub}</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(R)}</tspan> kgf`,
+        C.reac, { ancla: i === 0 ? "start" : "end", tam: 14 });
+    });
+
+    // cotas: x1, tramo cargado y resto
+    const yc = 238, xa = sx(s.x1), xb = sx(s.x2);
+    for (const x of [X0, xa, xb, X1]) el("line", { x1: x, y1: (x === xa || x === xb) ? ys + 2 : yBase + 6, x2: x, y2: yc + 7, stroke: C.t2, "stroke-width": 0.8, "stroke-dasharray": (x === xa || x === xb) ? "3 3" : "none", opacity: .8 }, svg);
+    const cota = (x1, x2, html) => {
+      if (x2 - x1 < 2) return;
+      const p = (x, d) => `${x},${yc} ${x + d * 8},${yc - 3.5} ${x + d * 8},${yc + 3.5}`;
+      el("line", { x1, y1: yc, x2, y2: yc, stroke: C.t2, "stroke-width": 1 }, svg);
+      if (x2 - x1 > 20) { el("polygon", { points: p(x1, 1), fill: C.t2 }, svg); el("polygon", { points: p(x2, -1), fill: C.t2 }, svg); }
+      if (x2 - x1 > 62) etiqueta(svg, (x1 + x2) / 2, yc, html, C.t2, { tam: 13 });
+    };
+    cota(X0, xa, `<tspan font-style="italic">x</tspan><tspan font-size="9.5" dy="3">1</tspan><tspan dy="-3"> = </tspan><tspan class="num">${fm(s.x1)}</tspan> m`);
+    cota(xa, xb, `<tspan font-style="italic">ℓ</tspan> = <tspan class="num">${fm(s.l)}</tspan> m`);
+    cota(xb, X1, `<tspan class="num">${fm(s.L - s.x2)}</tspan> m`);
+
+    // carga distribuida: bloque con flechas, arrastrable completo o por sus extremos
+    const yCarga = 52;                                          // borde superior del bloque
+    const g = el("g", { style: "cursor: grab" }, svg);
+    el("rect", { x: xa - 6, y: yCarga - 16, width: Math.max(xb - xa + 12, 12), height: yTop - yCarga + 16, fill: "transparent" }, g);
+    if (s.w > 0) {
+      el("rect", { x: xa, y: yCarga, width: xb - xa, height: yTop - yCarga - 1, fill: "url(#g-carga)" }, g);
+      const n = Math.max(2, Math.round((xb - xa) / 24) + 1);
+      for (let i = 0; i < n; i++) {
+        const x = xa + ((xb - xa) * i) / (n - 1);
+        flecha(g, x, yCarga, x, yTop - 1, C.carga, 2, 8, 4.5);
+      }
+      el("line", { x1: xa, y1: yCarga, x2: xb, y2: yCarga, stroke: C.carga, "stroke-width": 3, "stroke-linecap": "round" }, g);
+    }
+    arrastrable(g, svg, (x, x0, ini) => {
+      const l = ini.x2 - ini.x1;
+      let n1 = paso(ini.x1 + (x - x0));
+      n1 = Math.min(Math.max(0, n1), estado.L - l);
+      estado.x1 = n1; estado.x2 = n1 + l; sincronizar(); actualizar();
+    });
+    // asas de los extremos (cambian inicio y final)
+    const h1 = el("g", { style: "cursor: ew-resize" }, svg);
+    el("rect", { x: xa - 16, y: yCarga - 16, width: 32, height: 32, fill: "transparent" }, h1);
+    asa(h1, xa, yCarga, C);
+    arrastrable(h1, svg, (x) => fijar("x1", paso(x)));
+    const h2 = el("g", { style: "cursor: ew-resize" }, svg);
+    el("rect", { x: xb - 16, y: yCarga - 16, width: 32, height: 32, fill: "transparent" }, h2);
+    asa(h2, xb, yCarga, C);
+    arrastrable(h2, svg, (x) => fijar("x2", paso(x)));
+
+    // etiquetas de la carga: intensidad w y, opcionalmente, la resultante W en el centroide
+    const xm = (xa + xb) / 2;
+    const html_w = `<tspan font-style="italic">w</tspan> = <tspan class="num">${fmt(s.w)}</tspan> kgf/m`;
+    if (estado.resultante && s.W > 0) {
+      const xr = sx(s.c);
+      flecha(svg, xr, 8, xr, yTop - 1, C.carga, 2.2, 11, 6, { "stroke-dasharray": "6 4", opacity: .9 });
+      const izq = xr > X1 - 170;
+      etiqueta(svg, xr + (izq ? -12 : 12), 18, `<tspan font-style="italic">W</tspan> = <tspan class="num">${fmt(s.W)}</tspan> kgf`, C.carga, { ancla: izq ? "end" : "start", tam: 14, relleno: "#fff" });
+      // w a un lado del bloque, en la altura del borde superior
+      const ladoIzq = xa - X0 > X1 - xb;
+      etiqueta(svg, ladoIzq ? xa - 16 : xb + 16, yCarga, html_w, C.carga, { ancla: ladoIzq ? "end" : "start", tam: 14, relleno: C.cargaS });
+    } else {
+      const anc = xm < X0 + 110 ? "start" : xm > X1 - 110 ? "end" : "middle";
+      etiqueta(svg, anc === "start" ? xa : anc === "end" ? xb : xm, yCarga - 26, html_w, C.carga, { ancla: anc, tam: 14, relleno: C.cargaS });
+    }
+  }
+
+  // ---------------- diagramas ----------------
+  function ejeBase(svg, y0, C) {
+    el("line", { x1: X0, y1: y0, x2: X1, y2: y0, stroke: C.tinta, "stroke-width": 1.2 }, svg);
+    for (let i = 0; i <= 10; i++) {
+      const x = X0 + (i / 10) * (X1 - X0);
+      el("line", { x1: x, y1: 12, x2: x, y2: 178, stroke: C.ret, "stroke-width": 1 }, svg);
+    }
+  }
+  function rellenoOrdenadas(svg, id, color, suave) {
+    const d = el("defs", {}, svg);
+    d.innerHTML = `<pattern id="${id}" width="9" height="10" patternUnits="userSpaceOnUse">
+      <rect width="9" height="10" fill="${suave}"/><line x1="4.5" y1="0" x2="4.5" y2="10" stroke="${color}" stroke-width="1" opacity=".35"/></pattern>`;
+    return `url(#${id})`;
+  }
+  function marcasCarga(svg, s, C) {
+    for (const x of [s.x1, s.x2]) el("line", { x1: sx(x), y1: 12, x2: sx(x), y2: 178, stroke: C.carga, "stroke-width": 1, "stroke-dasharray": "3 3", opacity: .7 }, svg);
+  }
+  function dibujarV(s) {
+    const svg = $("svg-V"); svg.textContent = "";
+    const C = { l: css("--cortante"), f: css("--cortante-suave"), tinta: css("--tinta"), t2: css("--tinta-2"), ret: css("--reticula"), carga: css("--carga") };
+    const relleno = rellenoOrdenadas(svg, "o-V", C.l, C.f);
+    const y0 = 95, esc = 70 / Math.max(s.w * s.L / 2, 1);    // |V| nunca pasa de w·L/2
+    ejeBase(svg, y0, C);
+    cursor(svg, 12, 178);
+    marcasCarga(svg, s, C);
+    const yv = (v) => y0 - v * esc;
+    const xa = sx(s.x1), xb = sx(s.x2), yA = yv(s.RA), yB = yv(s.RA - s.W);
+    const trazo = `M${X0},${y0} L${X0},${yA} L${xa},${yA} L${xb},${yB} L${X1},${yB} L${X1},${y0}`;
+    el("path", { d: trazo + " Z", fill: relleno, stroke: "none" }, svg);
+    el("path", { d: trazo, fill: "none", stroke: C.l, "stroke-width": 2.6, "stroke-linejoin": "round" }, svg);
+    texto(svg, X0 - 10, y0 + 5, "0", { "text-anchor": "end", "font-size": 13, fill: C.t2, class: "num" });
+    texto(svg, X0 + 6, 22, "+", { "font-size": 15, fill: C.t2, "font-weight": 700 });
+    texto(svg, X0 + 6, 176, "−", { "font-size": 15, fill: C.t2, "font-weight": 700 });
+    if (s.RA > 1e-9) etiqueta(svg, Math.max(X0 + 40, (X0 + xa) / 2), yA - 15, `<tspan class="num">+${fmt(s.RA)}</tspan>`, C.l, { tam: 14 });
+    if (s.RB > 1e-9) etiqueta(svg, Math.min(X1 - 40, (xb + X1) / 2), yB + 15, `<tspan class="num">${fmt(-s.RB)}</tspan>`, C.l, { tam: 14 });
+    if (s.x0 !== null && s.W > 0) {
+      const x0p = sx(s.x0);
+      el("circle", { cx: x0p, cy: y0, r: 4.5, fill: "#fff", stroke: C.l, "stroke-width": 2 }, svg);
+      const anc = x0p < X0 + 90 ? "start" : x0p > X1 - 90 ? "end" : "middle";
+      etiqueta(svg, x0p, y0 + (s.RA > s.RB ? -22 : 22), `<tspan font-style="italic">V</tspan> = 0 en <tspan font-style="italic">x</tspan> = <tspan class="num">${fmt(s.x0, 2)}</tspan> m`, C.l, { ancla: anc, tam: 13 });
+    }
+  }
+  function dibujarM(s) {
+    const svg = $("svg-M"); svg.textContent = "";
+    const C = { l: css("--momento"), f: css("--momento-suave"), tinta: css("--tinta"), t2: css("--tinta-2"), ret: css("--reticula"), carga: css("--carga") };
+    const relleno = rellenoOrdenadas(svg, "o-M", C.l, C.f);
+    const signo = s.tension ? 1 : -1;
+    const y0 = s.tension ? 28 : 162;
+    const esc = 112 / Math.max(s.w * s.L * s.L / 8, 1);       // referencia: w·L²/8 (toda la viga cargada)
+    ejeBase(svg, y0, C);
+    cursor(svg, 12, 178);
+    marcasCarga(svg, s, C);
+    const pts = [];
+    const N = 160;
+    for (let i = 0; i <= N; i++) { const x = (s.L * i) / N; pts.push([sx(x), y0 + signo * s.M(x) * esc]); }
+    for (const x of [s.x1, s.x2]) pts.push([sx(x), y0 + signo * s.M(x) * esc]);
+    pts.sort((p, q) => p[0] - q[0]);
+    const curva = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+    el("path", { d: curva + ` L${X1},${y0} L${X0},${y0} Z`, fill: relleno, stroke: "none" }, svg);
+    el("path", { d: curva, fill: "none", stroke: C.l, "stroke-width": 2.6, "stroke-linejoin": "round" }, svg);
+    texto(svg, X0 - 10, y0 + 5, "0", { "text-anchor": "end", "font-size": 13, fill: C.t2, class: "num" });
+    if (s.Mmax > 1e-9) {
+      const xm = sx(s.x0), ym = y0 + signo * s.Mmax * esc;
+      el("line", { x1: xm, y1: 12, x2: xm, y2: 178, stroke: C.l, "stroke-width": 1, "stroke-dasharray": "2 3", opacity: .8 }, svg);
+      el("circle", { cx: xm, cy: ym, r: 4.5, fill: "#fff", stroke: C.l, "stroke-width": 2 }, svg);
+      const anc = xm < X0 + 80 ? "start" : xm > X1 - 80 ? "end" : "middle";
+      etiqueta(svg, xm + (anc === "start" ? 10 : anc === "end" ? -10 : 0), ym + (s.tension ? 20 : -18),
+        `<tspan font-style="italic">M</tspan><tspan font-size="10" dy="4">máx</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(s.Mmax)}</tspan>`, C.l, { ancla: anc, tam: 14 });
+    }
+  }
+  function cursor(svg, y1, y2) {
+    if (estado.x === null) return;
+    const x = sx(estado.x);
+    el("line", { x1: x, y1, x2: x, y2, stroke: css("--foco"), "stroke-width": 1.4 }, svg);
+  }
+
+  // ---------------- fórmulas ----------------
+  const cache = new Map();
+  function aSvg(latex) {
+    let n = cache.get(latex);
+    if (!n) { n = MathJax.tex2svg(latex, { display: false }); cache.set(latex, n); if (cache.size > 800) cache.clear(); }
+    return n.cloneNode(true);
+  }
+  function poner(id, lineas) {
+    const nodo = $(id);
+    const clave = JSON.stringify(lineas);
+    if (nodo.dataset.tex === clave) return;
+    if (!window.MathJax || !MathJax.tex2svg) return;
+    nodo.dataset.tex = clave;
+    nodo.replaceChildren(...lineas.map((l) => {
+      const [latex, clase] = Array.isArray(l) ? l : [l, ""];
+      const d = document.createElement("div");
+      d.className = "linea " + clase;
+      d.appendChild(aSvg(latex));
+      return d;
+    }));
+  }
+  const kgf = "\\ \\text{kgf}", m = "\\ \\text{m}", kgfm = "\\ \\text{kgf}\\cdot\\text{m}", kgfpm = "\\ \\text{kgf/m}";
+  const MAX = "M_{\\mathrm{m\\acute{a}x}}";
+  function escribirFormulas(s) {
+    const L = texm(s.L), w = tex(s.w), x1 = texm(s.x1), x2 = texm(s.x2), l = texm(s.l), c = texm(s.c);
+    poner("e-datos", [
+      `L = ${L}${m} \\qquad w = ${w}${kgfpm}`,
+      `x_1 = ${x1}${m} \\qquad x_2 = ${x2}${m}`,
+      `\\ell = x_2 - x_1 = ${l}${m}`,
+    ]);
+    poner("e-W", [
+      `W = w\\,\\ell = (${w}${kgfpm})(${l}${m})`,
+      [`W = ${tex(s.W)}${kgf}`, "fin"],
+      `\\bar{x} = \\dfrac{x_1 + x_2}{2} = \\dfrac{${x1}${m} + ${x2}${m}}{2} = ${c}${m}`,
+    ]);
+    poner("e-RB", [
+      `\\textstyle\\sum M_A = 0: \\quad R_B\\,L - W\\,\\bar{x} = 0`,
+      `R_B = \\dfrac{W\\,\\bar{x}}{L} = \\dfrac{(${tex(s.W)}${kgf})(${c}${m})}{${L}${m}}`,
+      [`R_B = ${tex(s.RB)}${kgf}`, "fin"],
+    ]);
+    poner("e-RA", [
+      `\\textstyle\\sum F_y = 0: \\quad R_A + R_B - W = 0`,
+      `R_A = W - R_B = ${tex(s.W)}${kgf} - ${tex(s.RB)}${kgf}`,
+      [`R_A = ${tex(s.RA)}${kgf}`, "fin"],
+    ]);
+    poner("e-V", [
+      [`0 \\le x \\le x_1: \\quad V = R_A = ${tex(s.RA)}${kgf}`, "fin v"],
+      [`x_1 \\le x \\le x_2: \\quad V = R_A - w\\,(x - x_1)`, "fin v"],
+      [`x_2 \\le x \\le L: \\quad V = R_A - W = ${tex(s.RA - s.W)}${kgf}`, "fin v"],
+    ]);
+    if (s.x0 === null || s.W <= 0) {
+      poner("e-M", [`\\text{Sin carga: } V = 0 \\text{ y } M = 0 \\text{ en toda la viga}`]);
+    } else {
+      const X0t = tex(s.x0, 2), d = tex(s.x0 - s.x1, 2);
+      const t1 = s.RA * Number(s.x0.toFixed(2)), t2 = (s.w * Number((s.x0 - s.x1).toFixed(2)) ** 2) / 2;   // con x₀ redondeado como se muestra
+      poner("e-M", [
+        `V = 0: \\quad R_A - w\\,(x_0 - x_1) = 0`,
+        `x_0 = x_1 + \\dfrac{R_A}{w}`,
+        `x_0 = ${x1}${m} + \\dfrac{${tex(s.RA)}${kgf}}{${w}${kgfpm}} = ${X0t}${m}`,
+        `${MAX} = R_A\\,x_0 - \\dfrac{w\\,(x_0 - x_1)^2}{2}`,
+        `R_A\\,x_0 = (${tex(s.RA)}${kgf})(${X0t}${m}) = ${tex(t1, 1)}${kgfm}`,
+        `\\dfrac{(${w}${kgfpm})(${d}${m})^2}{2} = ${tex(t2, 1)}${kgfm}`,
+        `${MAX} = ${tex(t1, 1)} - ${tex(t2, 1)}`,
+        [`${MAX} = ${tex(s.Mmax)}${kgfm}`, "fin m"],
+      ]);
+    }
+    if (estado.x === null) {
+      $("e-x").dataset.tex = ""; $("e-x").innerHTML = '<p class="nota">Toca o pasa el cursor sobre un diagrama para elegir la sección <i>x</i>.</p>';
+    } else {
+      const x = estado.x, X = tex(x, 2), V = s.V(x), M = s.M(x);
+      let lV, lM;
+      if (x <= s.x1) {
+        lV = `V = R_A = ${tex(V)}${kgf}`;
+        lM = [`M = R_A\\,x = (${tex(s.RA)}${kgf})(${X}${m})`];
+      } else if (x >= s.x2) {
+        lV = `V = R_A - W = ${tex(V)}${kgf}`;
+        lM = [`M = R_B\\,(L - x) = (${tex(s.RB)}${kgf})(${tex(s.L - x, 2)}${m})`];
+      } else {
+        const d = tex(x - s.x1, 2);
+        lV = `V = R_A - w\\,(x - x_1) = ${tex(s.RA)} - (${w})(${d}) = ${tex(V)}${kgf}`;
+        const u1 = s.RA * x, u2 = (s.w * (x - s.x1) ** 2) / 2;
+        lM = [`M = R_A\\,x - \\dfrac{w\\,(x - x_1)^2}{2}`,
+              `R_A\\,x = (${tex(s.RA)}${kgf})(${X}${m}) = ${tex(u1, 1)}${kgfm}`,
+              `\\dfrac{(${w}${kgfpm})(${d}${m})^2}{2} = ${tex(u2, 1)}${kgfm}`, `M = ${tex(u1, 1)} - ${tex(u2, 1)}`];
+      }
+      poner("e-x", [`x = ${X}${m}`, [lV, "fin v"], ...lM, [`M = ${tex(M)}${kgfm}`, "fin m"]]);
+    }
+  }
+
+  function lectura(s) {
+    if (estado.x === null) return;
+    $("lectura").innerHTML = `x = <b>${fmt(estado.x, 2)} m</b> &nbsp;·&nbsp; V = <b>${fmt(s.V(estado.x))} kgf</b> &nbsp;·&nbsp; M = <b>${fmt(s.M(estado.x))} kgf·m</b>`;
+  }
+
+  // ---------------- ciclo de actualización ----------------
+  let pendiente = false;
+  function actualizar() {
+    if (pendiente) return; pendiente = true;
+    requestAnimationFrame(() => {
+      pendiente = false;
+      const s = { ...resolver(estado), tension: estado.tension };
+      dibujarViga(s); dibujarV(s); dibujarM(s); escribirFormulas(s); lectura(s);
+    });
+  }
+  function fijar(clave, valor) {
+    let v = Number(valor); if (!Number.isFinite(v)) return;
+    if (clave === "L") {
+      v = Math.min(12, Math.max(2, v));
+      const f = v / estado.L;                                  // conserva la posición relativa de la carga
+      estado.L = v; estado.x1 = paso(estado.x1 * f); estado.x2 = Math.min(v, paso(estado.x2 * f));
+      if (estado.x2 - estado.x1 < LMIN) estado.x1 = Math.max(0, estado.x2 - LMIN);
+      if (estado.x !== null) estado.x = Math.min(estado.x, v);
+    }
+    if (clave === "w") estado.w = Math.min(5000, Math.max(0, v));
+    if (clave === "x1") estado.x1 = Math.min(Math.max(0, v), estado.x2 - LMIN);
+    if (clave === "x2") estado.x2 = Math.max(Math.min(estado.L, v), estado.x1 + LMIN);
+    sincronizar(); actualizar();
+  }
+  function sincronizar() {
+    $("L").value = estado.L; $("L-num").value = estado.L.toFixed(1);
+    $("w").value = estado.w; $("w-num").value = estado.w;
+    for (const k of ["x1", "x2"]) { $(k).max = estado.L; $(k + "-num").max = estado.L; $(k).value = estado[k]; $(k + "-num").value = estado[k].toFixed(2); }
+  }
+  for (const k of ["L", "w", "x1", "x2"]) {
+    $(k).addEventListener("input", (e) => fijar(k, e.target.value));
+    $(k + "-num").addEventListener("change", (e) => fijar(k, e.target.value));
+  }
+  $("tension").addEventListener("change", (e) => { estado.tension = e.target.checked; actualizar(); });
+  $("resultante").addEventListener("change", (e) => { estado.resultante = e.target.checked; actualizar(); });
+  for (const id of ["svg-V", "svg-M", "svg-viga"]) {
+    const svg = $(id);
+    const leer = (e) => { estado.x = Math.round(Math.min(estado.L, Math.max(0, xDesdePantalla(svg, e.clientX))) / 0.01) * 0.01; actualizar(); };
+    svg.addEventListener("pointermove", leer);
+    svg.addEventListener("pointerdown", leer);
+  }
+
+  medir(); sincronizar(); actualizar();
+  let anchoPrevio = window.innerWidth;
+  window.addEventListener("resize", () => { if (window.innerWidth !== anchoPrevio) { anchoPrevio = window.innerWidth; medir(); actualizar(); } });
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => {
+    if (MathJax.svgStylesheet) document.head.appendChild(MathJax.svgStylesheet());
+    document.querySelectorAll(".ec").forEach((n) => delete n.dataset.tex);
+    actualizar();
+  });
+  window.__viga = { resolver, estado, fijar };
+})();
+</script>
+
+</html>

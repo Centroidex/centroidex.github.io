@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EI-2.2 Viga con carga uniforme distribuida · Material de clase</title>
+<meta name="description" content="Apuntes, ejercicios e interactivos de clase de Ingeniería Civil y Arquitectura.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect x='1' y='1' width='32' height='32' rx='8' fill='%2313294b'/%3E%3Cpath d='M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 25.5h18' stroke='%23c4414f' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;family=STIX+Two+Text:ital@0;1&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f4f7fb}
+a{color:#2f5d9b}a:hover{color:#1f4473}
+a[style*="box-shadow"]{transition:transform .15s ease, box-shadow .15s ease}
+a[style*="box-shadow"]:hover{transform:translateY(-2px)}
+header nav a:hover{background:rgba(255,255,255,.12)}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#resultados a:hover{background:#eef3fa}
+@media (max-width:640px){
+  .h-portada{font-size:38px !important}
+  .h-pagina{font-size:32px !important}
+  .buscador{min-width:0 !important;flex:1 1 100% !important}
+  header nav{order:3}
+}
+</style>
+
+</head>
+<body>
+<div style="background: #f6f8fb; color: #1f2a37; font-family: 'Atkinson Hyperlegible', 'Arial Nova', Arial, sans-serif; font-size: 17px; line-height: 1.6; min-height: 100%">
+
+  <header style="background: #13294b; color: #ffffff">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px">
+      <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff">
+        <svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="8" fill="#ffffff"/><path d="M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5" stroke="#13294b" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 25.5h18" stroke="#c4414f" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Material de clase</span>
+      </a>
+      <nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 4px 6px; flex: 1 1 auto">
+        <a href="civil.html" aria-current="page" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #13294b; background: #ffffff; font-weight: 700">Ingeniería Civil</a>
+        <a href="arquitectura.html" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-weight: 700">Arquitectura</a>
+        <a href="index.html#interactivos" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Interactivos</a>
+        <a href="index.html#como" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Cómo usar el sitio</a>
+      </nav>
+      <div class="buscador" style="position: relative; min-width: 240px; flex: 0 1 320px">
+        <label style="display: flex; align-items: center; gap: 8px; background: #22406d; border: 1px solid #3a5b8c; border-radius: 10px; padding: 8px 12px">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#d5e1f1" stroke-width="2" fill="none"/><path d="M16.5 16.5L21 21" stroke="#d5e1f1" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="oculto">Buscar</span>
+          <input id="buscar" type="search" autocomplete="off" placeholder="Busca un tema o su código: EI-2.2" style="border: 0; background: transparent; font: inherit; font-size: 15px; width: 100%; outline: none; color: #ffffff">
+        </label>
+        <div id="resultados" hidden style="position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 6px); background: #ffffff; border-radius: 10px; box-shadow: 0 12px 30px rgba(8,22,45,.25); overflow: hidden; font-size: 15px"></div>
+      </div>
+    </div>
+  </header>
+  <div style="height: 10px; background-color: #e3eefa; background-image: linear-gradient(90deg, rgba(47,93,155,.12) 1px, transparent 1px); background-size: 32px 10px; border-bottom: 1px solid #c9d8ea"></div>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 28px 24px 56px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+
+    <!-- artículo -->
+    <article style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 26px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <nav aria-label="Ruta" style="font-size: 14px; color: #5b6b7d; display: flex; gap: 6px; flex-wrap: wrap"><a href="index.html">Inicio</a><span aria-hidden="true">›</span><a href="civil.html">Ingeniería Civil</a><span aria-hidden="true">›</span><a href="ei.html">Estructuras isostáticas</a><span aria-hidden="true">›</span><span>Unidad 2</span></nav>
+        <span style="align-self: flex-start; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 18px; letter-spacing: .06em; color: #ffffff; background: #1f2a37; border-radius: 8px; padding: 4px 12px">EI-2.2</span>
+        <h1 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 44px; line-height: 1.08" class="h-pagina; text-wrap: balance">Viga simplemente apoyada con carga uniforme distribuida</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; color: #5b6b7d">
+          <span style="padding: 3px 10px; border-radius: 999px; background: #e8f0fa; color: #2f5d9b; font-weight: 700">Ing. Civil</span>
+          <span style="padding: 3px 10px; border-radius: 999px; background: #f3eef6; color: #6b4a8a; font-weight: 700">Arquitectura</span>
+        </div>
+      </div>
+
+      <div style="background: #eef3fa; border: 1px solid #2f5d9b; border-radius: 10px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #2f5d9b; font-size: 18px">Al terminar este tema podrás</span>
+        <span>Sustituir una carga distribuida por su resultante, calcular las reacciones y encontrar dónde ocurre el momento máximo.</span>
+      </div>
+
+      <section id="esencial" style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 28px; color: #2f5d9b">1. Lo esencial</h2>
+        <p style="margin: 0; text-align: justify">Una carga uniforme de intensidad <i>w</i> que actúa sobre un tramo de longitud <i>ℓ</i> equivale, para el equilibrio, a una sola fuerza aplicada en el centro de ese tramo. Con esa resultante se plantean las ecuaciones de equilibrio igual que con una carga puntual.</p>
+
+        <figure style="margin: 6px 0; background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <svg width="100%" viewBox="0 0 640 190" role="img" aria-label="Viga simplemente apoyada con carga uniforme entre x1 y x2 y su resultante W en el centro del tramo">
+            <rect x="200" y="46" width="260" height="44" fill="#f7e1e3"/>
+            <path d="M200 46h260" stroke="#a3303c" stroke-width="3"/>
+            <path d="M200 46v42M226 46v42M252 46v42M278 46v42M304 46v42M330 46v42M356 46v42M382 46v42M408 46v42M434 46v42M460 46v42" stroke="#a3303c" stroke-width="1.6"/>
+            <path d="M330 10v80" stroke="#a3303c" stroke-width="2.2" stroke-dasharray="6 4"/><path d="M323 80l7 12 7-12z" fill="#a3303c"/>
+            <text x="342" y="22" font-size="16" font-family="Atkinson Hyperlegible, Arial, sans-serif" fill="#a3303c" font-weight="700" font-style="italic">W</text>
+            <text x="470" y="52" font-size="15" font-family="Atkinson Hyperlegible, Arial, sans-serif" fill="#a3303c" font-weight="700"><tspan font-style="italic">w</tspan> (kgf/m)</text>
+            <rect x="60" y="92" width="520" height="16" rx="2" fill="#c9d6e4" stroke="#1f2a37"/>
+            <path d="M68 108l-13 22h26zM572 108l-13 18h26z" fill="#ffffff" stroke="#1f2a37" stroke-width="1.4"/>
+            <circle cx="566" cy="130" r="3.5" fill="#fff" stroke="#1f2a37"/><circle cx="578" cy="130" r="3.5" fill="#fff" stroke="#1f2a37"/>
+            <path d="M44 134h50M546 134h50" stroke="#1f2a37" stroke-width="1.6"/>
+            <path d="M68 166h132M200 166h260" stroke="#5b6b7d"/><path d="M68 160v12M200 160v12M460 160v12" stroke="#5b6b7d"/>
+            <text x="134" y="186" text-anchor="middle" font-size="14" font-family="Atkinson Hyperlegible, Arial, sans-serif" fill="#1f2a37"><tspan font-style="italic">x</tspan>₁</text>
+            <text x="330" y="186" text-anchor="middle" font-size="14" font-family="Atkinson Hyperlegible, Arial, sans-serif" fill="#1f2a37"><tspan font-style="italic">ℓ</tspan> = <tspan font-style="italic">x</tspan>₂ − <tspan font-style="italic">x</tspan>₁</text>
+            <text x="40" y="104" text-anchor="end" font-size="15" font-family="Atkinson Hyperlegible, Arial, sans-serif" font-weight="700" font-style="italic" fill="#1f2a37">A</text>
+            <text x="600" y="104" font-size="15" font-family="Atkinson Hyperlegible, Arial, sans-serif" font-weight="700" font-style="italic" fill="#1f2a37">B</text>
+          </svg>
+          <figcaption style="font-size: 14px; color: #5b6b7d; text-align: center"><span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600">Figura 1.</span> <i>La carga distribuida y su resultante.</i></figcaption>
+        </figure>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px">
+          <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #5b6b7d; font-weight: 700">Resultante</span>
+            <span style="font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 22px"><i>W</i> = <i>w</i> · <i>ℓ</i></span>
+          </div>
+          <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #5b6b7d; font-weight: 700">Reacción en B</span>
+            <span style="font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 22px"><i>R</i><sub>B</sub> = <i>W</i> · <i>x̄</i> / <i>L</i></span>
+          </div>
+          <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #5b6b7d; font-weight: 700">Momento máximo, donde V = 0</span>
+            <span style="font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 22px"><i>x</i><sub>0</sub> = <i>x</i><sub>1</sub> + <i>R</i><sub>A</sub> / <i>w</i></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- interactivo -->
+      <section id="interactivo" style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 28px; color: #2f5d9b">2. Pruébalo tú</h2>
+        <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column">
+          <div style="background: #f6f8fb; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #e4eaf2">
+            <svg width="100%" viewBox="0 0 640 150" aria-hidden="true">
+              <rect x="200" y="14" width="240" height="30" fill="#f7e1e3"/><path d="M200 14h240" stroke="#a3303c" stroke-width="3"/>
+              <path d="M200 14v30M230 14v30M260 14v30M290 14v30M320 14v30M350 14v30M380 14v30M410 14v30M440 14v30" stroke="#a3303c" stroke-width="1.5"/>
+              <rect x="60" y="46" width="520" height="12" rx="2" fill="#c9d6e4" stroke="#1f2a37"/>
+              <path d="M60 58l-10 16h20zM580 58l-10 16h20z" fill="#fff" stroke="#1f2a37"/>
+              <path d="M60 140Q320 70 580 140" fill="#dff0d9" stroke="#5b9a4f" stroke-width="2.4"/>
+              <circle cx="320" cy="105" r="4.5" fill="#fff" stroke="#5b9a4f" stroke-width="2"/>
+            </svg>
+          </div>
+          <div style="padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between">
+            <span style="font-size: 15px; color: #4a5a6c; flex: 1 1 320px">Elige el inicio, el final y la intensidad de la carga; observa cómo cambian las reacciones, los diagramas y el momento máximo. El cálculo aparece paso a paso.</span>
+            <a href="viga-distribuida.html" style="text-decoration: none; background: #a3303c; color: #ffffff; font-weight: 700; padding: 11px 18px; border-radius: 10px">Abrir interactivo completo</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ejemplo -->
+      <section id="ejemplo" style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 28px; color: #2f5d9b">3. Ejemplo resuelto</h2>
+        <p style="margin: 0; text-align: justify">Una viga de 6 m soporta 1 500 kgf/m entre 1.5 m y 4.5 m, medidos desde A. Calcula las reacciones y el momento máximo.</p>
+        <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 19px">
+          <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #2f5d9b; font-size: 16px">Datos</span>
+          <span><i>L</i> = 6 m   <i>w</i> = 1 500 kgf/m   <i>x</i><sub>1</sub> = 1.5 m   <i>x</i><sub>2</sub> = 4.5 m</span>
+          <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #2f5d9b; font-size: 16px; padding-top: 6px">Sustitución</span>
+          <span><i>W</i> = (1 500 kgf/m)(3 m) = 4 500 kgf</span>
+          <span><i>R</i><sub>B</sub> = (4 500 kgf)(3 m) / 6 m</span>
+          <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #2f5d9b; font-size: 16px; padding-top: 6px">Resultado</span>
+          <span style="background: #dcf1ed; border-radius: 6px; padding: 2px 10px; align-self: flex-start"><i>R</i><sub>A</sub> = <i>R</i><sub>B</sub> = 2 250 kgf</span>
+          <span style="background: #dff0d9; border-radius: 6px; padding: 2px 10px; align-self: flex-start"><i>M</i><sub>máx</sub> = 5 063 kgf·m  en <i>x</i> = 3 m</span>
+        </div>
+        <div style="background: #fbeaea; border: 1px solid #8b1a1a; border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #8b1a1a; font-size: 17px">Error frecuente</span>
+          <span style="font-size: 16px">Usar el claro completo <i>L</i> en lugar de la longitud cargada <i>ℓ</i> al calcular la resultante.</span>
+        </div>
+      </section>
+
+      <!-- práctica -->
+      <section id="practica" style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 28px; color: #2f5d9b">4. Para practicar</h2>
+        <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden">
+          <details style="padding: 14px 18px; border-bottom: 1px solid #e4eaf2; ">
+            <summary style="display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center"><span><b>Ejercicio 1.</b> Viga de 5 m con 2 000 kgf/m en todo el claro. Calcula reacciones y momento máximo.</span><span style="font-size: 14px; font-weight: 700; color: #2f5d9b; background: #e8f0fa; border-radius: 8px; padding: 8px 12px">Ver respuesta</span></summary>
+            <div style="margin-top: 10px; padding: 10px 14px; border-radius: 8px; background: #ffffff; border: 1px solid #d6dee9; font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 18px"><i>R</i><sub>A</sub> = <i>R</i><sub>B</sub> = 5 000 kgf<br><i>M</i><sub>máx</sub> = 6 250 kgf·m en <i>x</i> = 2.5 m</div>
+          </details>
+          <details style="padding: 14px 18px; border-bottom: 1px solid #e4eaf2; ">
+            <summary style="display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center"><span><b>Ejercicio 2.</b> Viga de 6 m con 1 200 kgf/m entre 4 m y 6 m (junto al apoyo B).</span><span style="font-size: 14px; font-weight: 700; color: #2f5d9b; background: #e8f0fa; border-radius: 8px; padding: 8px 12px">Ver respuesta</span></summary>
+            <div style="margin-top: 10px; padding: 10px 14px; border-radius: 8px; background: #ffffff; border: 1px solid #d6dee9; font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 18px"><i>R</i><sub>A</sub> = 400 kgf   <i>R</i><sub>B</sub> = 2 000 kgf<br><i>M</i><sub>máx</sub> ≈ 1 667 kgf·m en <i>x</i> ≈ 4.33 m</div>
+          </details>
+          <details style="padding: 14px 18px;  background: #f3eef6;">
+            <summary style="display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center"><span><b>Para Arquitectura.</b> Losa de entrepiso con 500 kgf/m² y ancho tributario de 3 m sobre una viga de 5 m: carga por metro, reacciones y momento máximo.</span><span style="font-size: 14px; font-weight: 700; color: #6b4a8a; background: #ffffff; border-radius: 8px; padding: 8px 12px">Ver respuesta</span></summary>
+            <div style="margin-top: 10px; padding: 10px 14px; border-radius: 8px; background: #ffffff; border: 1px solid #d6dee9; font-family: 'STIX Two Text', 'Cambria Math', Cambria, serif; font-size: 18px"><i>w</i> = (500 kgf/m²)(3 m) = 1 500 kgf/m<br><i>R</i><sub>A</sub> = <i>R</i><sub>B</sub> = 3 750 kgf<br><i>M</i><sub>máx</sub> ≈ 4 688 kgf·m al centro</div>
+          </details>
+        </div>
+      </section>
+
+      <nav aria-label="Temas" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; border-top: 1px solid #d6dee9; padding-top: 18px">
+        <a href="ei-2-1.html" style="text-decoration: none; display: flex; flex-direction: column; font-size: 15px"><span style="color: #5b6b7d">← Anterior</span><b>EI-2.1 Carga puntual</b></a>
+        <a href="ei.html" style="text-decoration: none; display: flex; flex-direction: column; text-align: right; font-size: 15px"><span style="color: #5b6b7d">Volver a la materia →</span><b>Estructuras isostáticas</b></a>
+      </nav>
+    </article>
+
+    <!-- columna lateral -->
+    <aside style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 18px">
+      <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #5b6b7d; font-weight: 700">En este tema</span>
+        <a href="#esencial" style="text-decoration: none; font-size: 15px; padding: 4px 0">1. Lo esencial</a>
+        <a href="#interactivo" style="text-decoration: none; font-size: 15px; padding: 4px 0">2. Pruébalo tú</a>
+        <a href="#ejemplo" style="text-decoration: none; font-size: 15px; padding: 4px 0">3. Ejemplo resuelto</a>
+        <a href="#practica" style="text-decoration: none; font-size: 15px; padding: 4px 0">4. Para practicar</a>
+      </div>
+      <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <span style="font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #5b6b7d; font-weight: 700">Descargas</span>
+        <div style="display: flex; gap: 10px; align-items: center; font-size: 15px; color: #8796a8">
+          <span style="font-size: 12px; font-weight: 700; color: #ffffff; background: #8b1a1a; border-radius: 4px; padding: 3px 6px; letter-spacing: .04em; white-space: nowrap">EI-2.2-A</span><span>Apunte guiado</span></div>
+        <div style="display: flex; gap: 10px; align-items: center; font-size: 15px; color: #8796a8">
+          <span style="font-size: 12px; font-weight: 700; color: #ffffff; background: #8b1a1a; border-radius: 4px; padding: 3px 6px; letter-spacing: .04em; white-space: nowrap">EI-2.2-E</span><span>Ejercicios del tema</span></div>
+        <div style="display: flex; gap: 10px; align-items: center; font-size: 15px; color: #8796a8">
+          <span style="font-size: 12px; font-weight: 700; color: #ffffff; background: #2f5d9b; border-radius: 4px; padding: 3px 6px; letter-spacing: .04em; white-space: nowrap">EI-2-F</span><span>Formulario de la unidad</span></div>
+        <span style="font-size: 13px; color: #5b6b7d">Los archivos se publicarán próximamente. Descarga solo lo que se indique en clase.</span>
+      </div>
+      <div style="background: #ffffff; border: 1px solid #d6dee9; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #5b6b7d; font-weight: 700">Para profundizar</span>
+        <span style="font-size: 15px">Consulta la bibliografía de la materia en la biblioteca: capítulos de vigas, reacciones y diagramas de cortante y momento.</span>
+      </div>
+    </aside>
+  </div>
+
+  <footer style="background: #13294b; color: #a9bdd9">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 26px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 14px">
+      <span>Material de consulta para Ingeniería Civil y Arquitectura. Unidades del sistema técnico (kgf, cm).</span>
+      <span>Bibliografía: solo referencias; consulta los libros en la biblioteca.</span>
+    </div>
+  </footer>
+</div>
+<script src="sitio.js"></script>
+</body>
+</html>

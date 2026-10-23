@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Material de clase · Ingeniería Civil y Arquitectura</title>
+<meta name="description" content="Apuntes, ejercicios e interactivos de clase de Ingeniería Civil y Arquitectura.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect x='1' y='1' width='32' height='32' rx='8' fill='%2313294b'/%3E%3Cpath d='M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 25.5h18' stroke='%23c4414f' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;family=STIX+Two+Text:ital@0;1&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f4f7fb}
+a{color:#2f5d9b}a:hover{color:#1f4473}
+a[style*="box-shadow"]{transition:transform .15s ease, box-shadow .15s ease}
+a[style*="box-shadow"]:hover{transform:translateY(-2px)}
+header nav a:hover{background:rgba(255,255,255,.12)}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#resultados a:hover{background:#eef3fa}
+@media (max-width:640px){
+  .h-portada{font-size:38px !important}
+  .h-pagina{font-size:32px !important}
+  .buscador{min-width:0 !important;flex:1 1 100% !important}
+  header nav{order:3}
+}
+</style>
+
+</head>
+<body>
+<div style="background: #f4f7fb; color: #1f2a37; font-family: 'Atkinson Hyperlegible', 'Arial Nova', Arial, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100%">
+
+  <!-- barra superior (azul marino) -->
+  <header style="background: #13294b; color: #ffffff">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px">
+      <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff">
+        <svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="8" fill="#ffffff"/><path d="M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5" stroke="#13294b" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 25.5h18" stroke="#c4414f" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Material de clase</span>
+      </a>
+      <nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 4px 6px; flex: 1 1 auto">
+        <a href="civil.html" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-weight: 700">Ingeniería Civil</a>
+        <a href="arquitectura.html" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-weight: 700">Arquitectura</a>
+        <a href="index.html#interactivos" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Interactivos</a>
+        <a href="index.html#como" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Cómo usar el sitio</a>
+      </nav>
+      <div class="buscador" style="position: relative; min-width: 240px; flex: 0 1 320px">
+        <label style="display: flex; align-items: center; gap: 8px; background: #22406d; border: 1px solid #3a5b8c; border-radius: 10px; padding: 8px 12px">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#d5e1f1" stroke-width="2" fill="none"/><path d="M16.5 16.5L21 21" stroke="#d5e1f1" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="oculto">Buscar</span>
+          <input id="buscar" type="search" autocomplete="off" placeholder="Busca un tema o su código: EI-2.2" style="border: 0; background: transparent; font: inherit; font-size: 15px; width: 100%; outline: none; color: #ffffff">
+        </label>
+        <div id="resultados" hidden style="position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 6px); background: #ffffff; border-radius: 10px; box-shadow: 0 12px 30px rgba(8,22,45,.25); overflow: hidden; font-size: 15px"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- portada: banda azul con cuadrícula de plano -->
+  <section style="background-color: #1b3a66; background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px; color: #ffffff; position: relative; overflow: hidden">
+    <svg width="100%" height="120" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; opacity: .22">
+      <path d="M0 104h1440" stroke="#ffffff" stroke-width="2"/>
+      <path d="M720 104V60L880 20L1040 60V104M720 60h320M800 40v64M880 20v84M960 40v64M720 60l80 44M800 40l80 64M880 20l80 84M960 40l80 64M1040 60l-80 44" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+      <path d="M1100 104V70h260v34M1100 70l130-40 130 40" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+    </svg>
+    <div style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 72px; display: flex; flex-wrap: wrap; gap: 36px; align-items: center; position: relative">
+      <div style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <span style="align-self: flex-start; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #13294b; background: #ffd9a8; font-weight: 700; padding: 4px 10px; border-radius: 6px">Consulta para alumnos</span>
+        <h1 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 56px; line-height: 1.02" class="h-portada; color: #ffffff">Apuntes, ejercicios e interactivos de cada clase</h1>
+        <p style="margin: 0; max-width: 58ch; color: #d5e1f1; font-size: 18px">Elige tu carrera y tu materia. Cada tema tiene un resumen con las fórmulas de clase, ejemplos resueltos en kgf y cm, simuladores para practicar y los archivos para descargar.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 6px">
+          <a href="civil.html" style="text-decoration: none; background: #ffffff; color: #13294b; font-weight: 700; padding: 12px 18px; border-radius: 10px">Ingeniería Civil</a>
+          <a href="arquitectura.html" style="text-decoration: none; background: transparent; color: #ffffff; font-weight: 700; padding: 11px 17px; border-radius: 10px; border: 1px solid #8aa6cc">Arquitectura</a>
+        </div>
+      </div>
+      <form id="form-codigo" style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 10px; background: #ffffff; color: #1f2a37; border-radius: 16px; padding: 20px 22px; box-shadow: 0 18px 40px rgba(8, 22, 45, .35)">
+        <label for="codigo" style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #13294b; font-size: 21px">¿Te dieron un código en clase?</label>
+        <span style="font-size: 15px; color: #4a5a6c">Escríbelo para ir directo al tema y a sus descargas.</span>
+        <div style="display: flex; gap: 8px">
+          <input id="codigo" type="text" placeholder="EI-2.2" style="flex: 1 1 auto; min-width: 0; font: inherit; font-size: 20px; letter-spacing: .08em; text-transform: uppercase; padding: 10px 14px; border: 2px solid #c9d6e8; border-radius: 10px; background: #f4f7fb; color: #1f2a37">
+          <button type="submit" style="font: inherit; border: 0; cursor: pointer; background: #a3303c; color: #ffffff; font-weight: 700; padding: 10px 20px; border-radius: 10px">Ir</button>
+        </div>
+        <span id="msg-codigo" role="status" style="font-size: 13px; color: #5b6b7d">Ejemplos: EI-2.2 · EI-2.1 · EI</span>
+      </form>
+    </div>
+  </section>
+
+  <!-- carreras -->
+  <section aria-labelledby="t-carreras" style="max-width: 1200px; margin: -36px auto 0; padding: 0 24px; position: relative">
+    <h2 id="t-carreras" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Elige tu carrera</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 24px">
+
+      <!-- Ingeniería Civil -->
+      <a href="civil.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(19, 41, 75, .14)">
+        <svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: puente atirantado sobre un río con montañas al fondo" style="display: block">
+          <defs>
+            <linearGradient id="civ-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcd8f2"/><stop offset=".7" stop-color="#e8f2fb"/><stop offset="1" stop-color="#fdf3e4"/></linearGradient>
+            <linearGradient id="civ-rio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fa6d6"/><stop offset="1" stop-color="#3f78b3"/></linearGradient>
+            <linearGradient id="civ-pilon" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9eef5"/><stop offset="1" stop-color="#aebdd0"/></linearGradient>
+          </defs>
+          <rect width="580" height="240" fill="url(#civ-cielo)"/>
+          <circle cx="470" cy="62" r="26" fill="#ffd9a8"/>
+          <path d="M0 150L70 98L130 132L200 84L270 128L330 104L400 140L470 96L580 140V240H0Z" fill="#a9c6bf"/>
+          <path d="M0 168L90 132L170 156L260 124L360 158L450 130L580 162V240H0Z" fill="#7fae9f"/>
+          <rect y="176" width="580" height="64" fill="url(#civ-rio)"/>
+          <path d="M30 196h60M140 212h80M300 200h50M420 218h90M220 228h40" stroke="#cfe3f5" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+          <!-- cables -->
+          <g stroke="#ffffff" stroke-width="1.6" opacity=".95">
+            <path d="M170 52L60 150M170 52L84 150M170 52L108 150M170 52L132 150M170 52L208 150M170 52L232 150M170 52L256 150M170 52L280 150"/>
+            <path d="M410 52L300 150M410 52L324 150M410 52L348 150M410 52L372 150M410 52L448 150M410 52L472 150M410 52L496 150M410 52L520 150"/>
+          </g>
+          <!-- pilones -->
+          <path d="M162 186L166 46h8l4 140z" fill="url(#civ-pilon)" stroke="#13294b" stroke-width="1.5"/>
+          <path d="M402 186L406 46h8l4 140z" fill="url(#civ-pilon)" stroke="#13294b" stroke-width="1.5"/>
+          <!-- tablero -->
+          <rect x="0" y="146" width="580" height="10" fill="#2f5d9b"/>
+          <rect x="0" y="156" width="580" height="5" fill="#13294b"/>
+          <path d="M0 146h580" stroke="#9ab8dd" stroke-width="1.5"/>
+          <!-- auto -->
+          <rect x="250" y="136" width="30" height="10" rx="3" fill="#c4414f"/><rect x="256" y="131" width="16" height="7" rx="2" fill="#c4414f"/>
+          <!-- pilas -->
+          <rect x="160" y="161" width="20" height="40" fill="#5f7896"/><rect x="400" y="161" width="20" height="40" fill="#5f7896"/>
+          <!-- carga distribuida estilizada -->
+          <g opacity=".9">
+            <rect x="36" y="18" width="82" height="22" rx="6" fill="#ffffff"/>
+            <path d="M44 25v8M56 25v8M68 25v8M80 25v8M92 25v8M104 25v8" stroke="#a3303c" stroke-width="2" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div style="padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #13294b">Ingeniería Civil</span>
+            <span style="font-size: 15px; color: #4a5a6c">8 materias</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #dbe8f7; color: #1f4473; font-weight: 700">Estructuras</span>
+            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #f6e7cf; color: #7a4f0e; font-weight: 700">Geotecnia</span>
+            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #d6efeb; color: #1b6158; font-weight: 700">Hidráulica</span>
+          </div>
+          <span style="font-weight: 700; color: #2f5d9b; padding-top: 2px">Ver materias →</span>
+        </div>
+      </a>
+
+      <!-- Arquitectura -->
+      <a href="arquitectura.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(19, 41, 75, .14)">
+        <svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: edificio contemporáneo con fachada de cristal, volado y árboles" style="display: block">
+          <defs>
+            <linearGradient id="arq-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cdea"/><stop offset=".65" stop-color="#f1ebf6"/><stop offset="1" stop-color="#fcefe6"/></linearGradient>
+            <linearGradient id="arq-vidrio" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bcd8f2"/><stop offset="1" stop-color="#6f9fcf"/></linearGradient>
+            <linearGradient id="arq-muro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6f2ec"/><stop offset="1" stop-color="#ddd3c6"/></linearGradient>
+          </defs>
+          <rect width="580" height="240" fill="url(#arq-cielo)"/>
+          <circle cx="110" cy="64" r="30" fill="#ffd9a8"/>
+          <!-- ciudad al fondo -->
+          <path d="M0 200V150h40v-24h30v30h26v-40h34v84M430 200V130h36v-26h30v40h28v-20h56v76z" fill="#c9bcdc"/>
+          <!-- edificio principal -->
+          <rect x="190" y="70" width="200" height="130" fill="url(#arq-muro)" stroke="#4b3566" stroke-width="1.5"/>
+          <rect x="206" y="84" width="168" height="54" fill="url(#arq-vidrio)" stroke="#4b3566" stroke-width="1.2"/>
+          <path d="M248 84v54M290 84v54M332 84v54M206 111h168" stroke="#ffffff" stroke-width="1.5" opacity=".8"/>
+          <path d="M214 92l22 38M300 92l14 26" stroke="#ffffff" stroke-width="3" opacity=".35" stroke-linecap="round"/>
+          <!-- volado -->
+          <rect x="300" y="146" width="140" height="26" fill="#6b4a8a" stroke="#4b3566" stroke-width="1.5"/>
+          <rect x="310" y="152" width="120" height="14" fill="url(#arq-vidrio)"/>
+          <path d="M340 152v14M370 152v14M400 152v14" stroke="#ffffff" stroke-width="1.2" opacity=".8"/>
+          <!-- planta baja -->
+          <rect x="206" y="160" width="80" height="40" fill="url(#arq-vidrio)" stroke="#4b3566" stroke-width="1.2"/>
+          <path d="M246 160v40" stroke="#ffffff" stroke-width="1.5"/>
+          <!-- cubierta -->
+          <path d="M180 70h220" stroke="#4b3566" stroke-width="5" stroke-linecap="round"/>
+          <!-- árboles -->
+          <circle cx="150" cy="176" r="22" fill="#86b88a"/><circle cx="166" cy="164" r="16" fill="#9ccb9c"/><rect x="152" y="186" width="5" height="16" fill="#6a5a46"/>
+          <circle cx="478" cy="180" r="18" fill="#86b88a"/><circle cx="492" cy="170" r="13" fill="#9ccb9c"/><rect x="478" y="188" width="5" height="14" fill="#6a5a46"/>
+          <!-- terreno -->
+          <rect y="200" width="580" height="40" fill="#e9dfd0"/>
+          <path d="M0 200h580" stroke="#4b3566" stroke-width="1.5"/>
+          <path d="M20 218h40M120 226h60M260 214h50M400 228h70M500 216h50" stroke="#d1c3ae" stroke-width="2" stroke-linecap="round"/>
+          <!-- cota de diseño -->
+          <g stroke="#6b4a8a" stroke-width="1.4"><path d="M190 56h200M190 50v12M390 50v12"/></g>
+          <rect x="262" y="45" width="56" height="20" rx="10" fill="#ffffff" stroke="#6b4a8a" stroke-width="1.2"/>
+          <text x="290" y="59" text-anchor="middle" font-size="11" font-family="Atkinson Hyperlegible, Arial, sans-serif" font-weight="700" fill="#6b4a8a">12.00 m</text>
+        </svg>
+        <div style="padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #3d2758">Arquitectura</span>
+            <span style="font-size: 15px; color: #4a5a6c">2 materias</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #dbe8f7; color: #1f4473; font-weight: 700">Estructuras</span>
+          </div>
+          <span style="font-weight: 700; color: #6b4a8a; padding-top: 2px">Ver materias →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <main style="display: flex; flex-direction: column">
+
+    <!-- así se ve un tema -->
+    <section aria-labelledby="t-recientes" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 56px 24px 48px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+        <h2 id="t-recientes" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Temas publicados</h2>
+        <a href="civil.html" style="font-weight: 700; font-size: 15px">Ver todas las materias →</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px">
+
+        <a href="ei-2-1.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
+          <div style="background: #dbe8f7; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center">
+            <span style="font-size: 13px; font-weight: 700; color: #1f4473">Estructuras isostáticas</span>
+            <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #13294b; color: #ffffff; font-weight: 700; letter-spacing: .05em">EI-2.1</span>
+          </div>
+          <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2">Vigas con carga puntual</span>
+            <span style="color: #4a5a6c; font-size: 15px">Reacciones, diagramas de cortante y momento, y el momento máximo.</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px">
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Apunte</span>
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #fbe3e5; color: #8b1a1a; font-weight: 700">Interactivo</span>
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Ejercicios</span>
+              <span style="font-size: 12px; color: #5b6b7d; padding: 3px 0 3px 6px">Civil · Arq.</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="ei-2-2.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
+          <div style="background: #dbe8f7; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center">
+            <span style="font-size: 13px; font-weight: 700; color: #1f4473">Estructuras isostáticas</span>
+            <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #13294b; color: #ffffff; font-weight: 700; letter-spacing: .05em">EI-2.2</span>
+          </div>
+          <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2">Vigas con carga uniforme distribuida</span>
+            <span style="color: #4a5a6c; font-size: 15px">Resultante, reacciones y el punto donde el cortante se anula.</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px">
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Apunte</span>
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #fbe3e5; color: #8b1a1a; font-weight: 700">Interactivo</span>
+              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Ejercicios</span>
+              <span style="font-size: 12px; color: #5b6b7d; padding: 3px 0 3px 6px">Civil · Arq.</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- interactivos: banda de color -->
+    <section id="interactivos" aria-labelledby="t-inter" style="background: #e3eefa">
+      <div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 52px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="t-inter" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Interactivos para practicar</h2>
+            <span style="color: #4a5a6c">Mueve cargas, cambia datos y mira cómo responde la estructura.</span>
+          </div>
+          
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px">
+
+          <a href="viga-puntual.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .1)">
+            <div style="background: #f7fafd; border-bottom: 1px solid #e1e9f3; padding: 14px 16px">
+              <svg width="100%" height="96" viewBox="0 0 320 96" aria-hidden="true">
+                <path d="M150 4v24" stroke="#a3303c" stroke-width="3.5" stroke-linecap="round"/><path d="M143 22l7 10 7-10z" fill="#a3303c"/><circle cx="150" cy="6" r="5" fill="#f7e1e3" stroke="#a3303c" stroke-width="2"/>
+                <rect x="18" y="33" width="284" height="10" rx="2" fill="#b9c9da" stroke="#1f2a37"/>
+                <path d="M22 43l-9 14h18zM298 43l-9 14h18z" fill="#fff" stroke="#1f2a37"/>
+                <path d="M18 92L150 66L302 92Z" fill="#dff0d9" stroke="#5b9a4f" stroke-width="2"/>
+              </svg>
+            </div>
+            <div style="padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Viga con carga puntual</span>
+              <span style="color: #4a5a6c; font-size: 15px">Mueve la carga y observa reacciones, cortante y momento.</span>
+            </div>
+          </a>
+
+          <a href="viga-distribuida.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .1)">
+            <div style="background: #f7fafd; border-bottom: 1px solid #e1e9f3; padding: 14px 16px">
+              <svg width="100%" height="96" viewBox="0 0 320 96" aria-hidden="true">
+                <rect x="90" y="8" width="130" height="24" fill="#f7e1e3"/><path d="M90 8h130" stroke="#a3303c" stroke-width="3"/>
+                <path d="M100 8v24M120 8v24M140 8v24M160 8v24M180 8v24M200 8v24M220 8v24" stroke="#a3303c" stroke-width="1.6"/>
+                <rect x="18" y="33" width="284" height="10" rx="2" fill="#b9c9da" stroke="#1f2a37"/>
+                <path d="M22 43l-9 14h18zM298 43l-9 14h18z" fill="#fff" stroke="#1f2a37"/>
+                <path d="M18 92Q160 50 302 92Z" fill="#dff0d9" stroke="#5b9a4f" stroke-width="2"/>
+              </svg>
+            </div>
+            <div style="padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Viga con carga distribuida</span>
+              <span style="color: #4a5a6c; font-size: 15px">Elige inicio, final e intensidad de la carga.</span>
+            </div>
+          </a>
+
+          <div style="background: rgba(255,255,255,.55); border: 2px dashed #9fb6d4; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-height: 170px">
+            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px; color: #2f5d9b">Próximamente</span>
+            <span style="color: #4a5a6c; font-size: 15px">Círculo de Mohr · Esfuerzos en la masa de suelo · Flujo en tuberías</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- cómo usar el sitio -->
+    <section id="como" aria-labelledby="t-como" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 52px 24px 60px; display: flex; flex-direction: column; gap: 16px">
+      <h2 id="t-como" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Cómo usar este sitio</h2>
+      <p style="margin: 0; max-width: 70ch; color: #4a5a6c">Todo el material está disponible siempre. En clase se indica qué tema revisar y qué descargar, según la planeación del curso.</p>
+      <ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px">
+        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
+          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #13294b; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">1</span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Anota el código</b><span style="font-size: 15px; color: #4a5a6c">En clase se indica, por ejemplo: «Para el jueves, revisen EI-2.2 y descarguen el apunte».</span></span>
+        </li>
+        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
+          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #2f5d9b; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">2</span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Búscalo aquí</b><span style="font-size: 15px; color: #4a5a6c">Escribe el código en el buscador o entra por tu carrera y materia.</span></span>
+        </li>
+        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
+          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #a3303c; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">3</span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Descarga lo indicado</b><span style="font-size: 15px; color: #4a5a6c">Cada archivo tiene su letra: A apunte, E ejercicios, F formulario.</span></span>
+        </li>
+      </ol>
+    </section>
+  </main>
+
+  <footer style="background: #13294b; color: #a9bdd9">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 26px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 14px">
+      <span>Material de consulta para Ingeniería Civil y Arquitectura. Unidades del sistema técnico (kgf, cm).</span>
+      <span>Bibliografía: solo referencias; consulta los libros en la biblioteca.</span>
+    </div>
+  </footer>
+</div>
+<script src="sitio.js"></script>
+</body>
+</html>
