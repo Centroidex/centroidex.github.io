@@ -3,95 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Material de clase · Ingeniería Civil y Arquitectura</title>
-<meta name="description" content="Apuntes, ejercicios e interactivos de clase de Ingeniería Civil y Arquitectura.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect x='1' y='1' width='32' height='32' rx='8' fill='%2313294b'/%3E%3Cpath d='M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 25.5h18' stroke='%23c4414f' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;family=STIX+Two+Text:ital@0;1&amp;display=swap">
-<style>
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:#f4f7fb}
-a{color:#2f5d9b}a:hover{color:#1f4473}
-a[style*="box-shadow"]{transition:transform .15s ease, box-shadow .15s ease}
-a[style*="box-shadow"]:hover{transform:translateY(-2px)}
-header nav a:hover{background:rgba(255,255,255,.12)}
-details summary{list-style:none;cursor:pointer}
-details summary::-webkit-details-marker{display:none}
-.oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-#resultados a:hover{background:#eef3fa}
-@media (max-width:640px){
-  .h-portada{font-size:38px !important}
-  .h-pagina{font-size:32px !important}
-  .buscador{min-width:0 !important;flex:1 1 100% !important}
-  header nav{order:3}
-}
-</style>
-
+<title>Aula Centroide · Ingeniería Civil y Arquitectura</title>
+<meta name="description" content="Aula Centroide: apuntes, ejemplos resueltos, ejercicios e interactivos para Ingeniería Civil y Arquitectura.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2244 419 465 465%22%3E%3Cpath fill=%22%230F2557%22 d=%22M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M299 629V443A186 186 0 0 1 485 629Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M254 674V860A186 186 0 0 1 68 674Z%22/%3E%3Cpath fill=%22%230F2557%22 d=%22M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;family=Montserrat:wght@700;800&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;family=STIX+Two+Text:ital@0;1&amp;display=swap">
+<link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-<div style="background: #f4f7fb; color: #1f2a37; font-family: 'Atkinson Hyperlegible', 'Arial Nova', Arial, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100%">
-
-  <!-- barra superior (azul marino) -->
-  <header style="background: #13294b; color: #ffffff">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px">
-      <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff">
-        <svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="8" fill="#ffffff"/><path d="M7 21h20M9 21l3-8h10l3 8M12 13l5-5 5 5" stroke="#13294b" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 25.5h18" stroke="#c4414f" stroke-width="2.4" stroke-linecap="round"/></svg>
-        <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Material de clase</span>
-      </a>
-      <nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 4px 6px; flex: 1 1 auto">
-        <a href="civil.html" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-weight: 700">Ingeniería Civil</a>
-        <a href="arquitectura.html" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-weight: 700">Arquitectura</a>
-        <a href="index.html#interactivos" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Interactivos</a>
-        <a href="index.html#como" style="padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #d5e1f1">Cómo usar el sitio</a>
-      </nav>
-      <div class="buscador" style="position: relative; min-width: 240px; flex: 0 1 320px">
-        <label style="display: flex; align-items: center; gap: 8px; background: #22406d; border: 1px solid #3a5b8c; border-radius: 10px; padding: 8px 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#d5e1f1" stroke-width="2" fill="none"/><path d="M16.5 16.5L21 21" stroke="#d5e1f1" stroke-width="2" stroke-linecap="round"/></svg>
-          <span class="oculto">Buscar</span>
-          <input id="buscar" type="search" autocomplete="off" placeholder="Busca un tema o su código: EI-2.2" style="border: 0; background: transparent; font: inherit; font-size: 15px; width: 100%; outline: none; color: #ffffff">
-        </label>
-        <div id="resultados" hidden style="position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 6px); background: #ffffff; border-radius: 10px; box-shadow: 0 12px 30px rgba(8,22,45,.25); overflow: hidden; font-size: 15px"></div>
-      </div>
+<header class="barra">
+  <div class="contenedor">
+    <a class="marca" href="index.html"><svg class="simbolo" width="34" height="34" viewBox="44 419 465 465" aria-hidden="true"><path fill="#0F2557" d="M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z"/><path fill="#FF6B00" d="M299 629V443A186 186 0 0 1 485 629Z"/><path fill="#FF6B00" d="M254 674V860A186 186 0 0 1 68 674Z"/><path fill="#0F2557" d="M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z"/></svg><span class="marca-texto"><span class="marca-aula">Aula</span><span class="marca-nombre">Centroide</span></span><span class="oculto"> — inicio</span></a>
+    <nav class="nav" aria-label="Principal"><a href="civil.html">Ingeniería Civil</a><a href="arquitectura.html">Arquitectura</a><a href="interactivos.html">Interactivos</a><a href="index.html#como">Cómo usar el sitio</a></nav>
+    <div class="buscador">
+      <label><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7a90" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg><span class="oculto">Buscar</span><input id="buscar" type="search" autocomplete="off" placeholder="Busca un tema o código: EI-2.2"></label>
+      <div id="resultados" class="resultados" hidden></div>
     </div>
-  </header>
-
-  <!-- portada: banda azul con cuadrícula de plano -->
-  <section style="background-color: #1b3a66; background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px; color: #ffffff; position: relative; overflow: hidden">
-    <svg width="100%" height="120" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; opacity: .22">
-      <path d="M0 104h1440" stroke="#ffffff" stroke-width="2"/>
-      <path d="M720 104V60L880 20L1040 60V104M720 60h320M800 40v64M880 20v84M960 40v64M720 60l80 44M800 40l80 64M880 20l80 84M960 40l80 64M1040 60l-80 44" stroke="#ffffff" stroke-width="1.5" fill="none"/>
-      <path d="M1100 104V70h260v34M1100 70l130-40 130 40" stroke="#ffffff" stroke-width="1.5" fill="none"/>
-    </svg>
-    <div style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 72px; display: flex; flex-wrap: wrap; gap: 36px; align-items: center; position: relative">
-      <div style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
-        <span style="align-self: flex-start; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #13294b; background: #ffd9a8; font-weight: 700; padding: 4px 10px; border-radius: 6px">Consulta para alumnos</span>
-        <h1 style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 56px; line-height: 1.02" class="h-portada; color: #ffffff">Apuntes, ejercicios e interactivos de cada clase</h1>
-        <p style="margin: 0; max-width: 58ch; color: #d5e1f1; font-size: 18px">Elige tu carrera y tu materia. Cada tema tiene un resumen con las fórmulas de clase, ejemplos resueltos en kgf y cm, simuladores para practicar y los archivos para descargar.</p>
-        <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 6px">
-          <a href="civil.html" style="text-decoration: none; background: #ffffff; color: #13294b; font-weight: 700; padding: 12px 18px; border-radius: 10px">Ingeniería Civil</a>
-          <a href="arquitectura.html" style="text-decoration: none; background: transparent; color: #ffffff; font-weight: 700; padding: 11px 17px; border-radius: 10px; border: 1px solid #8aa6cc">Arquitectura</a>
-        </div>
-      </div>
-      <form id="form-codigo" style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 10px; background: #ffffff; color: #1f2a37; border-radius: 16px; padding: 20px 22px; box-shadow: 0 18px 40px rgba(8, 22, 45, .35)">
-        <label for="codigo" style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; color: #13294b; font-size: 21px">¿Te dieron un código en clase?</label>
-        <span style="font-size: 15px; color: #4a5a6c">Escríbelo para ir directo al tema y a sus descargas.</span>
-        <div style="display: flex; gap: 8px">
-          <input id="codigo" type="text" placeholder="EI-2.2" style="flex: 1 1 auto; min-width: 0; font: inherit; font-size: 20px; letter-spacing: .08em; text-transform: uppercase; padding: 10px 14px; border: 2px solid #c9d6e8; border-radius: 10px; background: #f4f7fb; color: #1f2a37">
-          <button type="submit" style="font: inherit; border: 0; cursor: pointer; background: #a3303c; color: #ffffff; font-weight: 700; padding: 10px 20px; border-radius: 10px">Ir</button>
-        </div>
-        <span id="msg-codigo" role="status" style="font-size: 13px; color: #5b6b7d">Ejemplos: EI-2.2 · EI-2.1 · EI</span>
-      </form>
+  </div>
+</header>
+<main>
+<section class="portada">
+  <svg class="marca-agua" viewBox="44 419 465 465" aria-hidden="true"><path fill="#0F2557" d="M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z"/><path fill="#FF6B00" d="M299 629V443A186 186 0 0 1 485 629Z"/><path fill="#FF6B00" d="M254 674V860A186 186 0 0 1 68 674Z"/><path fill="#0F2557" d="M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z"/></svg>
+  <div class="contenedor">
+    <div>
+      <span class="antetitulo antetitulo--marca">Aula Centroide · Ingeniería Civil y Arquitectura</span>
+      <h1>Aprende ingeniería <em>practicando</em>, no solo leyendo.</h1>
+      <p class="bajada">Cada tema reúne lo esencial con sus fórmulas, un ejemplo resuelto paso a paso en kgf y cm, un interactivo para experimentar y ejercicios con respuesta.</p>
+      <div class="acciones"><a class="boton boton--primario" href="civil.html">Ingeniería Civil</a><a class="boton boton--secundario" href="arquitectura.html">Arquitectura</a></div>
+      <div class="cifras"><div><b>8</b><span>materias</span></div><div><b>2</b><span>temas publicados</span></div><div><b>2</b><span>interactivos</span></div></div>
     </div>
-  </section>
-
-  <!-- carreras -->
-  <section aria-labelledby="t-carreras" style="max-width: 1200px; margin: -36px auto 0; padding: 0 24px; position: relative">
-    <h2 id="t-carreras" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Elige tu carrera</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 24px">
-
-      <!-- Ingeniería Civil -->
-      <a href="civil.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(19, 41, 75, .14)">
-        <svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: puente atirantado sobre un río con montañas al fondo" style="display: block">
+    <form id="form-codigo" class="caja-codigo">
+      <h2><label for="codigo">¿Te dieron un código en clase?</label></h2>
+      <p>Escríbelo para ir directo al tema y a sus descargas.</p>
+      <div class="fila"><input id="codigo" type="text" autocomplete="off" placeholder="EI-2.2"><button class="boton boton--tinto" type="submit">Ir</button></div>
+      <span id="msg-codigo" class="msg" role="status">Ejemplos: EI-2.1 · EI-2.2 · EI</span>
+      <div class="anatomia" aria-label="Cómo se lee un código"><span><b>EI</b>materia</span>–<span><b>2</b>unidad</span>.<span><b>2</b>tema</span>–<span><b>A</b>archivo</span></div>
+    </form>
+  </div>
+</section><section class="seccion">
+  <div class="contenedor">
+    <div class="encabezado-seccion"><div><span class="antetitulo">Empieza aquí</span><h2>Elige tu carrera</h2></div></div>
+    <div class="rejilla rejilla--2">
+      <a class="tarjeta carrera" href="civil.html"><svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: puente atirantado sobre un río con montañas al fondo" style="display: block">
           <defs>
             <linearGradient id="civ-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcd8f2"/><stop offset=".7" stop-color="#e8f2fb"/><stop offset="1" stop-color="#fdf3e4"/></linearGradient>
             <linearGradient id="civ-rio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fa6d6"/><stop offset="1" stop-color="#3f78b3"/></linearGradient>
@@ -124,24 +76,8 @@ details summary::-webkit-details-marker{display:none}
             <rect x="36" y="18" width="82" height="22" rx="6" fill="#ffffff"/>
             <path d="M44 25v8M56 25v8M68 25v8M80 25v8M92 25v8M104 25v8" stroke="#a3303c" stroke-width="2" stroke-linecap="round"/>
           </g>
-        </svg>
-        <div style="padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
-            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #13294b">Ingeniería Civil</span>
-            <span style="font-size: 15px; color: #4a5a6c">8 materias</span>
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px">
-            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #dbe8f7; color: #1f4473; font-weight: 700">Estructuras</span>
-            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #f6e7cf; color: #7a4f0e; font-weight: 700">Geotecnia</span>
-            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #d6efeb; color: #1b6158; font-weight: 700">Hidráulica</span>
-          </div>
-          <span style="font-weight: 700; color: #2f5d9b; padding-top: 2px">Ver materias →</span>
-        </div>
-      </a>
-
-      <!-- Arquitectura -->
-      <a href="arquitectura.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(19, 41, 75, .14)">
-        <svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: edificio contemporáneo con fachada de cristal, volado y árboles" style="display: block">
+        </svg><div class="cuerpo"><div class="titulo"><h3>Ingeniería Civil</h3><span class="num">8 materias</span></div><div class="etiquetas"><span class="etiqueta" style="background:var(--est-s);color:var(--est)">Estructuras</span><span class="etiqueta" style="background:var(--geo-s);color:var(--geo)">Geotecnia</span><span class="etiqueta" style="background:var(--hid-s);color:var(--hid)">Hidráulica</span></div><span class="ir">Ver materias →</span></div></a>
+      <a class="tarjeta carrera carrera--arq" href="arquitectura.html"><svg width="100%" viewBox="0 0 580 240" role="img" aria-label="Ilustración: edificio contemporáneo con fachada de cristal, volado y árboles" style="display: block">
           <defs>
             <linearGradient id="arq-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cdea"/><stop offset=".65" stop-color="#f1ebf6"/><stop offset="1" stop-color="#fcefe6"/></linearGradient>
             <linearGradient id="arq-vidrio" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bcd8f2"/><stop offset="1" stop-color="#6f9fcf"/></linearGradient>
@@ -176,146 +112,56 @@ details summary::-webkit-details-marker{display:none}
           <g stroke="#6b4a8a" stroke-width="1.4"><path d="M190 56h200M190 50v12M390 50v12"/></g>
           <rect x="262" y="45" width="56" height="20" rx="10" fill="#ffffff" stroke="#6b4a8a" stroke-width="1.2"/>
           <text x="290" y="59" text-anchor="middle" font-size="11" font-family="Atkinson Hyperlegible, Arial, sans-serif" font-weight="700" fill="#6b4a8a">12.00 m</text>
-        </svg>
-        <div style="padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
-            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #3d2758">Arquitectura</span>
-            <span style="font-size: 15px; color: #4a5a6c">2 materias</span>
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px">
-            <span style="font-size: 13px; padding: 5px 11px; border-radius: 999px; background: #dbe8f7; color: #1f4473; font-weight: 700">Estructuras</span>
-          </div>
-          <span style="font-weight: 700; color: #6b4a8a; padding-top: 2px">Ver materias →</span>
-        </div>
-      </a>
+        </svg><div class="cuerpo"><div class="titulo"><h3 style="color:#3d2758">Arquitectura</h3><span class="num">2 materias</span></div><div class="etiquetas"><span class="etiqueta" style="background:var(--est-s);color:var(--est)">Estructuras</span></div><span class="ir">Ver materias →</span></div></a>
     </div>
-  </section>
-
-  <main style="display: flex; flex-direction: column">
-
-    <!-- así se ve un tema -->
-    <section aria-labelledby="t-recientes" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 56px 24px 48px; display: flex; flex-direction: column; gap: 18px">
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
-        <h2 id="t-recientes" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Temas publicados</h2>
-        <a href="civil.html" style="font-weight: 700; font-size: 15px">Ver todas las materias →</a>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px">
-
-        <a href="ei-2-1.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
-          <div style="background: #dbe8f7; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center">
-            <span style="font-size: 13px; font-weight: 700; color: #1f4473">Estructuras isostáticas</span>
-            <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #13294b; color: #ffffff; font-weight: 700; letter-spacing: .05em">EI-2.1</span>
-          </div>
-          <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px">
-            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2">Vigas con carga puntual</span>
-            <span style="color: #4a5a6c; font-size: 15px">Reacciones, diagramas de cortante y momento, y el momento máximo.</span>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px">
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Apunte</span>
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #fbe3e5; color: #8b1a1a; font-weight: 700">Interactivo</span>
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Ejercicios</span>
-              <span style="font-size: 12px; color: #5b6b7d; padding: 3px 0 3px 6px">Civil · Arq.</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="ei-2-2.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
-          <div style="background: #dbe8f7; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center">
-            <span style="font-size: 13px; font-weight: 700; color: #1f4473">Estructuras isostáticas</span>
-            <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #13294b; color: #ffffff; font-weight: 700; letter-spacing: .05em">EI-2.2</span>
-          </div>
-          <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px">
-            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2">Vigas con carga uniforme distribuida</span>
-            <span style="color: #4a5a6c; font-size: 15px">Resultante, reacciones y el punto donde el cortante se anula.</span>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px">
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Apunte</span>
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #fbe3e5; color: #8b1a1a; font-weight: 700">Interactivo</span>
-              <span style="font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #eef2f7; color: #4a5a6c">Ejercicios</span>
-              <span style="font-size: 12px; color: #5b6b7d; padding: 3px 0 3px 6px">Civil · Arq.</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <!-- interactivos: banda de color -->
-    <section id="interactivos" aria-labelledby="t-inter" style="background: #e3eefa">
-      <div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 52px; display: flex; flex-direction: column; gap: 18px">
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
-          <div style="display: flex; flex-direction: column; gap: 4px">
-            <h2 id="t-inter" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Interactivos para practicar</h2>
-            <span style="color: #4a5a6c">Mueve cargas, cambia datos y mira cómo responde la estructura.</span>
-          </div>
-          
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px">
-
-          <a href="viga-puntual.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .1)">
-            <div style="background: #f7fafd; border-bottom: 1px solid #e1e9f3; padding: 14px 16px">
-              <svg width="100%" height="96" viewBox="0 0 320 96" aria-hidden="true">
-                <path d="M150 4v24" stroke="#a3303c" stroke-width="3.5" stroke-linecap="round"/><path d="M143 22l7 10 7-10z" fill="#a3303c"/><circle cx="150" cy="6" r="5" fill="#f7e1e3" stroke="#a3303c" stroke-width="2"/>
-                <rect x="18" y="33" width="284" height="10" rx="2" fill="#b9c9da" stroke="#1f2a37"/>
-                <path d="M22 43l-9 14h18zM298 43l-9 14h18z" fill="#fff" stroke="#1f2a37"/>
-                <path d="M18 92L150 66L302 92Z" fill="#dff0d9" stroke="#5b9a4f" stroke-width="2"/>
-              </svg>
-            </div>
-            <div style="padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 6px">
-              <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Viga con carga puntual</span>
-              <span style="color: #4a5a6c; font-size: 15px">Mueve la carga y observa reacciones, cortante y momento.</span>
-            </div>
-          </a>
-
-          <a href="viga-distribuida.html" style="text-decoration: none; color: #1f2a37; background: #ffffff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(19, 41, 75, .1)">
-            <div style="background: #f7fafd; border-bottom: 1px solid #e1e9f3; padding: 14px 16px">
-              <svg width="100%" height="96" viewBox="0 0 320 96" aria-hidden="true">
-                <rect x="90" y="8" width="130" height="24" fill="#f7e1e3"/><path d="M90 8h130" stroke="#a3303c" stroke-width="3"/>
-                <path d="M100 8v24M120 8v24M140 8v24M160 8v24M180 8v24M200 8v24M220 8v24" stroke="#a3303c" stroke-width="1.6"/>
-                <rect x="18" y="33" width="284" height="10" rx="2" fill="#b9c9da" stroke="#1f2a37"/>
-                <path d="M22 43l-9 14h18zM298 43l-9 14h18z" fill="#fff" stroke="#1f2a37"/>
-                <path d="M18 92Q160 50 302 92Z" fill="#dff0d9" stroke="#5b9a4f" stroke-width="2"/>
-              </svg>
-            </div>
-            <div style="padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 6px">
-              <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px">Viga con carga distribuida</span>
-              <span style="color: #4a5a6c; font-size: 15px">Elige inicio, final e intensidad de la carga.</span>
-            </div>
-          </a>
-
-          <div style="background: rgba(255,255,255,.55); border: 2px dashed #9fb6d4; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-height: 170px">
-            <span style="font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 600; font-size: 21px; color: #2f5d9b">Próximamente</span>
-            <span style="color: #4a5a6c; font-size: 15px">Círculo de Mohr · Esfuerzos en la masa de suelo · Flujo en tuberías</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- cómo usar el sitio -->
-    <section id="como" aria-labelledby="t-como" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 52px 24px 60px; display: flex; flex-direction: column; gap: 16px">
-      <h2 id="t-como" style="margin: 0; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 32px; color: #13294b">Cómo usar este sitio</h2>
-      <p style="margin: 0; max-width: 70ch; color: #4a5a6c">Todo el material está disponible siempre. En clase se indica qué tema revisar y qué descargar, según la planeación del curso.</p>
-      <ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px">
-        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
-          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #13294b; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">1</span>
-          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Anota el código</b><span style="font-size: 15px; color: #4a5a6c">En clase se indica, por ejemplo: «Para el jueves, revisen EI-2.2 y descarguen el apunte».</span></span>
-        </li>
-        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
-          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #2f5d9b; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">2</span>
-          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Búscalo aquí</b><span style="font-size: 15px; color: #4a5a6c">Escribe el código en el buscador o entra por tu carrera y materia.</span></span>
-        </li>
-        <li style="background: #ffffff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 16px rgba(19, 41, 75, .08)">
-          <span style="flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #a3303c; color: #ffffff; font-family: 'Bahnschrift SemiBold', 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; justify-content: center">3</span>
-          <span style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 17px">Descarga lo indicado</b><span style="font-size: 15px; color: #4a5a6c">Cada archivo tiene su letra: A apunte, E ejercicios, F formulario.</span></span>
-        </li>
-      </ol>
-    </section>
-  </main>
-
-  <footer style="background: #13294b; color: #a9bdd9">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 26px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 14px">
-      <span>Material de consulta para Ingeniería Civil y Arquitectura. Unidades del sistema técnico (kgf, cm).</span>
-      <span>Bibliografía: solo referencias; consulta los libros en la biblioteca.</span>
-    </div>
-  </footer>
-</div>
+  </div>
+</section><section class="seccion seccion--gris">
+  <div class="contenedor">
+    <div class="encabezado-seccion"><div><span class="antetitulo">Por área</span><h2>Explora las materias</h2><p>Las materias están agrupadas por área de conocimiento. Cada una tiene su código de dos letras.</p></div><a class="enlace-flecha" href="civil.html">Ver todas las materias</a></div>
+    <div class="rejilla"><a class="tarjeta area" href="civil.html#est"><span class="icono" style="background:var(--est-s);color:var(--est)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 18h19"/><path d="M4.5 18l3.5-9h8l3.5 9"/><path d="M8 9l4 9 4-9"/><path d="M4 21h2M18 21h2"/></svg></span><div><h3>Estructuras</h3><p style="color:var(--tinta-2);font-size:15px;margin-top:4px">Cómo se sostienen las estructuras: equilibrio, esfuerzos y análisis.</p></div><ul><li><span>Estructuras isostáticas</span><b>EI</b></li><li><span>Mecánica de materiales</span><b>MM</b></li><li><span>Análisis estructural</span><b>AE</b></li></ul></a><a class="tarjeta area" href="civil.html#geo"><span class="icono" style="background:var(--geo-s);color:var(--geo)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7c3-2 6 2 9 0s6-2 9 0"/><path d="M3 12.5h18M3 18h18"/><circle cx="7" cy="15.3" r=".6" fill="currentColor"/><circle cx="13" cy="15.3" r=".6" fill="currentColor"/><circle cx="18" cy="15.3" r=".6" fill="currentColor"/><circle cx="10" cy="20.3" r=".6" fill="currentColor"/><circle cx="16" cy="20.3" r=".6" fill="currentColor"/></svg></span><div><h3>Geotecnia</h3><p style="color:var(--tinta-2);font-size:15px;margin-top:4px">El suelo como material: propiedades, cimentaciones y terracerías.</p></div><ul><li><span>Mecánica de suelos</span><b>MS</b></li><li><span>Cimentaciones</span><b>CI</b></li><li><span>Movimiento de tierras</span><b>MT</b></li></ul></a><a class="tarjeta area" href="civil.html#hid"><span class="icono" style="background:var(--hid-s);color:var(--hid)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8c2.8 3.6 4.6 6 4.6 8.4a4.6 4.6 0 01-9.2 0c0-2.4 1.8-4.8 4.6-8.4z"/><path d="M3 20c1.5-1.2 3-1.2 4.5 0s3 1.2 4.5 0 3-1.2 4.5 0 3 1.2 4.5 0"/></svg></span><div><h3>Hidráulica</h3><p style="color:var(--tinta-2);font-size:15px;margin-top:4px">El agua en reposo y en movimiento, de la lluvia a los canales.</p></div><ul><li><span>Hidráulica</span><b>HI</b></li><li><span>Hidrología</span><b>HD</b></li></ul></a></div>
+  </div>
+</section><section class="seccion">
+  <div class="contenedor">
+    <div class="encabezado-seccion"><div><span class="antetitulo">Disponibles</span><h2>Temas publicados</h2><p>Cada tema queda publicado de forma permanente; en clase se indica cuál revisar.</p></div><a class="enlace-flecha" href="ei.html">Ir a Estructuras isostáticas</a></div>
+    <div class="lista-temas"><a class="tarjeta fila-tema" href="ei-2-1.html"><span class="codigo codigo--grande">EI-2.1</span><div><h3>Viga simplemente apoyada con carga puntual</h3><p>Reacciones, diagramas de cortante y momento, y el momento máximo.</p></div><div class="etiquetas"><span class="etiqueta">Apunte</span><span class="etiqueta etiqueta--int">Interactivo</span><span class="etiqueta">Ejercicios</span></div></a><a class="tarjeta fila-tema" href="ei-2-2.html"><span class="codigo codigo--grande">EI-2.2</span><div><h3>Viga simplemente apoyada con carga uniforme distribuida</h3><p>Resultante, reacciones y el punto donde el cortante se anula.</p></div><div class="etiquetas"><span class="etiqueta">Apunte</span><span class="etiqueta etiqueta--int">Interactivo</span><span class="etiqueta">Ejercicios</span></div></a></div>
+  </div>
+</section><section class="seccion banda-oscura">
+  <div class="contenedor">
+    <div class="encabezado-seccion"><div><span class="antetitulo">Aprende haciendo</span><h2>Interactivos para practicar</h2><p>Mueve cargas, cambia los datos y mira cómo responde la estructura. El cálculo se escribe paso a paso.</p></div><a class="enlace-flecha" style="color:#fff" href="interactivos.html">Ver todos</a></div>
+    <div class="rejilla"><a class="tarjeta interactivo" href="viga-puntual.html"><div class="vista"><svg width="100%" viewBox="0 0 320 112" aria-hidden="true">
+  <path d="M120 4v20" stroke="#a3303c" stroke-width="3.5" stroke-linecap="round"/><path d="M113 19l7 10 7-10z" fill="#a3303c"/><circle cx="120" cy="6" r="5" fill="#fbeaec" stroke="#a3303c" stroke-width="2"/>
+  <rect x="18" y="30" width="284" height="10" rx="2" fill="#c3d0df" stroke="#0e1a2b"/>
+  <path d="M22 40l-8 13h16zM298 40l-8 13h16z" fill="#fff" stroke="#0e1a2b"/>
+  <path d="M18 64h284" stroke="#9aa8ba" stroke-dasharray="3 4"/>
+  <path d="M18 64L120 104L302 64Z" fill="#dff0d9" stroke="#4f8f43" stroke-width="2" stroke-linejoin="round"/>
+</svg></div><div class="cuerpo"><span class="codigo" style="align-self:flex-start">EI-2.1</span><h3>Viga con carga puntual</h3><p>Mueve la carga y observa reacciones, cortante y momento.</p><span class="abrir">Abrir interactivo →</span></div></a><a class="tarjeta interactivo" href="viga-distribuida.html"><div class="vista"><svg width="100%" viewBox="0 0 320 112" aria-hidden="true">
+  <rect x="90" y="6" width="130" height="22" fill="#fbeaec"/><path d="M90 6h130" stroke="#a3303c" stroke-width="3"/>
+  <path d="M90 6v22M111.7 6v22M133.3 6v22M155 6v22M176.7 6v22M198.3 6v22M220 6v22" stroke="#a3303c" stroke-width="1.6"/>
+  <rect x="18" y="30" width="284" height="10" rx="2" fill="#c3d0df" stroke="#0e1a2b"/>
+  <path d="M22 40l-8 13h16zM298 40l-8 13h16z" fill="#fff" stroke="#0e1a2b"/>
+  <path d="M18 64h284" stroke="#9aa8ba" stroke-dasharray="3 4"/>
+  <path d="M18 64L90 88Q155 112 220 88L302 64Z" fill="#dff0d9" stroke="#4f8f43" stroke-width="2" stroke-linejoin="round"/>
+</svg></div><div class="cuerpo"><span class="codigo" style="align-self:flex-start">EI-2.2</span><h3>Viga con carga distribuida</h3><p>Elige inicio, final e intensidad de la carga.</p><span class="abrir">Abrir interactivo →</span></div></a><div class="proximamente"><h3>Próximamente</h3><p>Círculo de Mohr · Esfuerzos en la masa de suelo · Flujo en tuberías</p></div></div>
+  </div>
+</section><section class="seccion" id="como">
+  <div class="contenedor">
+    <div class="encabezado-seccion"><div><span class="antetitulo">Guía rápida</span><h2>Cómo usar este sitio</h2><p>Todo el material está disponible siempre. En clase se indica qué tema revisar y qué descargar, según la planeación del curso.</p></div></div>
+    <ol class="pasos">
+      <li class="tarjeta"><h3>Anota el código</h3><p>En clase se indica, por ejemplo: «Para el jueves, revisen EI-2.2 y descarguen el apunte».</p></li>
+      <li class="tarjeta"><h3>Búscalo aquí</h3><p>Escríbelo en la caja de código o en el buscador, o entra por tu carrera y materia.</p></li>
+      <li class="tarjeta"><h3>Estudia y practica</h3><p>Lee lo esencial, prueba el interactivo, resuelve los ejercicios y descarga lo indicado: A apunte, E ejercicios, F formulario.</p></li>
+    </ol>
+  </div>
+</section>
+</main>
+<footer class="pie-sitio">
+  <div class="contenedor">
+    <div><a class="marca" href="index.html"><svg class="simbolo" width="34" height="34" viewBox="44 419 465 465" aria-hidden="true"><path fill="#0F2557" d="M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z"/><path fill="#FF6B00" d="M299 629V443A186 186 0 0 1 485 629Z"/><path fill="#FF6B00" d="M254 674V860A186 186 0 0 1 68 674Z"/><path fill="#0F2557" d="M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z"/></svg><span class="marca-texto"><span class="marca-aula">Aula</span><span class="marca-nombre">Centroide</span></span><span class="oculto"> — inicio</span></a><p class="lema">Donde la teoría encuentra su equilibrio.</p><p>Apuntes, ejemplos resueltos, ejercicios e interactivos para Ingeniería Civil y Arquitectura. Unidades del sistema técnico (kgf, cm).</p></div>
+    <div><h4>Explorar</h4><a href="civil.html">Ingeniería Civil</a><a href="arquitectura.html">Arquitectura</a><a href="interactivos.html">Interactivos</a><a href="index.html#como">Cómo usar el sitio</a></div>
+    <div><h4>Materias</h4><a href="ei.html">Estructuras isostáticas</a><a href="mm.html">Mecánica de materiales</a><a href="ae.html">Análisis estructural</a><a href="ms.html">Mecánica de suelos</a><a href="civil.html">Ver todas →</a></div>
+  </div>
+  <div class="contenedor legal">La bibliografía se cita solo como referencia; consulta los libros en la biblioteca.</div>
+</footer>
 <script src="sitio.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <html lang="es">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2244 419 465 465%22%3E%3Cpath fill=%22%230F2557%22 d=%22M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M299 629V443A186 186 0 0 1 485 629Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M254 674V860A186 186 0 0 1 68 674Z%22/%3E%3Cpath fill=%22%230F2557%22 d=%22M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z%22/%3E%3C/svg%3E">
 <title>EI-2.1 · Viga simplemente apoyada</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,7 +111,7 @@ mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1
 @media (prefers-reduced-motion: no-preference) { .carga-g { transition: none; } }
 </style>
 
-<nav style="max-width: 980px; margin: 0 auto; padding: 12px 16px 0; font-family: 'Atkinson Hyperlegible', Arial, sans-serif; font-size: 15px"><a href="ei-2-1.html" style="color:#2f5d9b; font-weight:700; text-decoration:none">← Volver al tema EI-2.1</a> · <a href="index.html" style="color:#2f5d9b; text-decoration:none">Inicio</a></nav>
+<nav style="max-width:980px;margin:0 auto;padding:14px 16px 0;font-family:Lexend,Arial,sans-serif;font-size:15px;display:flex;gap:16px;flex-wrap:wrap"><a href="ei-2-1.html" style="color:#1f4fd1;font-weight:600;text-decoration:none">← Volver al tema EI-2.1</a><a href="interactivos.html" style="color:#44546a;text-decoration:none">Todos los interactivos</a><a href="index.html" style="color:#44546a;text-decoration:none">Aula Centroide</a></nav>
 <div class="pagina">
   <header>
     <span class="materia">Estructuras isostáticas</span>
@@ -141,7 +142,7 @@ mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1
       <input id="a" type="range" min="0" step="0.05">
     </div>
     <div class="opciones">
-      <label><input type="checkbox" id="tension"> Dibujar el momento del lado de tensión (abajo)</label>
+      <label><input type="checkbox" id="tension" checked> Dibujar el momento del lado de tensión (abajo)</label>
     </div>
   </section>
 
@@ -194,7 +195,7 @@ mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1
 <script>
 (() => {
   // ---------------- estado y utilidades ----------------
-  const estado = { L: 6, P: 5000, a: 2.4, x: null, tension: false };
+  const estado = { L: 6, P: 5000, a: 2.4, x: null, tension: true };
   const $ = (id) => document.getElementById(id);
   const NS = "http://www.w3.org/2000/svg";
   const fmt = (v, d = 0) => {

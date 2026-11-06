@@ -1,5 +1,5 @@
-# Material de clase
+# Aula Centroide
 
-Sitio de consulta para alumnos de Ingeniería Civil y Arquitectura: apuntes, ejercicios e interactivos, en unidades del sistema técnico (kgf, cm).
+Sitio de consulta para alumnos de Ingeniería Civil y Arquitectura: apuntes, ejemplos resueltos, ejercicios e interactivos en unidades del sistema técnico (kgf, cm).
 
-Se publica con GitHub Pages en https://centroidex.github.io
+Publicado con GitHub Pages en https://centroidex.github.io · Estilo documentado en DESIGN.md.
