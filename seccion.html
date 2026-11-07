@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2244 419 465 465%22%3E%3Cpath fill=%22%230F2557%22 d=%22M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M299 629V443A186 186 0 0 1 485 629Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M254 674V860A186 186 0 0 1 68 674Z%22/%3E%3Cpath fill=%22%230F2557%22 d=%22M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z%22/%3E%3C/svg%3E">
+<title>EI-5.4 · Secciones compuestas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+  window.MathJax = { tex: {}, svg: { fontCache: "none" }, startup: { typeset: false } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
+<style>
+[hidden] { display: none !important; }
+/* Sección compuesta: arriba la forma y sus medidas; a la izquierda la sección a escala con su centroide,
+   la gráfica de aportes a la inercia y la tabla de cálculo; a la derecha el cálculo paso a paso. Tema claro. */
+:root {
+  color-scheme: light;
+  --papel: #f6f8fb; --hoja: #ffffff; --tinta: #1f2a37; --tinta-2: #5b6b7d; --reticula: #e4eaf2; --borde: #d6dee9;
+  --parte: #2f5d9b; --parte-suave: #e6eef8;          /* números y contornos de cada parte */
+  --propia: #3a7cc0; --propia-suave: #d9e9f8;        /* inercia propia de cada parte */
+  --steiner: #5b9a4f; --steiner-suave: #dff0d9;      /* término A·d² (traslado de ejes) */
+  --centroide: #7c5cc4; --centroide-suave: #ece6f8;  /* centroide y ejes centroidales */
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+body { background: var(--papel); color: var(--tinta); font: 16px/1.5 var(--f-texto); }
+.pagina { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.materia { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); font-weight: 700; }
+h1 { font-size: clamp(24px, 3.2vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.indicacion { margin: 0; color: var(--tinta-2); max-width: 75ch; }
+
+.controles { background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px; padding: 14px 16px;
+  display: grid; gap: 14px 24px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.control { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.control.ancho { grid-column: 1 / -1; }
+.control-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.control label, .control .rotulo { font-weight: 700; font-size: 15px; }
+.sim { font-style: italic; font-weight: 400; color: var(--tinta-2); }
+.valor { display: inline-flex; align-items: baseline; gap: 4px; }
+.valor input { width: 5.4em; font: 500 15px var(--f-num); text-align: right; color: var(--tinta); border: 1px solid var(--borde);
+  border-radius: 6px; padding: 3px 6px; background: var(--papel); font-variant-numeric: tabular-nums; }
+.valor span { font-size: 14px; color: var(--tinta-2); }
+input[type="range"] { width: 100%; accent-color: var(--parte); height: 26px; }
+input:focus-visible, button:focus-visible { outline: 3px solid var(--centroide); outline-offset: 2px; }
+.segmento { display: flex; flex-wrap: wrap; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: var(--papel); }
+.segmento button { flex: 1 1 auto; font: 600 15px var(--f-texto); color: var(--tinta-2); background: transparent; border: 0;
+  border-left: 1px solid var(--borde); padding: 7px 10px; cursor: pointer; min-height: 38px; display: inline-flex; gap: 6px; align-items: center; justify-content: center; }
+.segmento button:first-child { border-left: 0; }
+.segmento button svg { width: 18px; height: 18px; }
+.segmento button[aria-pressed="true"] { background: var(--tinta); color: #fff; }
+.opciones { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; font-size: 15px; color: var(--tinta-2); }
+.opciones label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.aviso { grid-column: 1 / -1; margin: 0; font-size: 14px; color: #8a5a00; background: #fff6e5; border: 1px solid #f0d9a8; border-radius: 8px; padding: 6px 10px; }
+
+.cuerpo { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+.tarjeta { background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px; padding: 12px 14px 10px; min-width: 0; }
+.tarjeta h2 { font-size: 15px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.figuras { display: grid; gap: 10px; min-width: 0; }
+svg.dibujo { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+svg text { font-family: var(--f-texto); fill: var(--tinta); }
+svg .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--tinta-2); margin: 4px 2px 2px; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 16px; height: 12px; border-radius: 3px; display: inline-block; }
+
+.tabla-envoltura { overflow-x: auto; }
+table.calc { width: 100%; border-collapse: collapse; font-size: 14px; white-space: nowrap; }
+.calc th { font-size: 12px; color: var(--tinta-2); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--borde); text-align: right; }
+.calc th:first-child, .calc td:first-child { text-align: left; }
+.calc td { padding: 5px 8px; border-bottom: 1px solid var(--reticula); font-family: var(--f-num); text-align: right; font-variant-numeric: tabular-nums; }
+.calc td:first-child { font-family: var(--f-texto); }
+.calc tr.parte { cursor: pointer; }
+.calc tr.parte:hover td { background: #f3f6fa; }
+.calc tr.sel td { background: var(--centroide-suave) !important; }
+.calc tr.total td { font-weight: 700; border-top: 2px solid var(--borde); border-bottom: 0; background: var(--papel); }
+.calc .insignia { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--parte); color: var(--parte); font: 700 12.5px var(--f-texto); margin-right: 6px; }
+
+.pasos { display: grid; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .pasos { position: static; } }
+.paso { padding: 8px 0 10px; border-top: 1px solid var(--reticula); min-width: 0; }
+.paso:first-of-type { border-top: 0; }
+.paso h3 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); margin: 0 0 4px; }
+.paso p { margin: 2px 0 4px; font-size: 15px; }
+.ec { overflow-x: auto; overflow-y: hidden; padding: 2px 0; display: grid; gap: 2px; justify-items: start; min-width: 0; }
+.ec .linea { font-size: 17px; line-height: 1; padding: 3px 2px; }
+.ec .linea mjx-container { margin: 0 !important; position: relative; }
+mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0 !important; border: 0 !important; height: 1px !important; width: 1px !important; overflow: hidden !important; display: block !important; user-select: none; }
+.ec .linea mjx-container svg { max-width: none; }
+.ec .linea.fin { background: var(--centroide-suave); border-radius: 6px; padding: 4px 8px; }
+.ec .linea.fin.i { background: var(--steiner-suave); }
+.ec .linea.fin.s { background: var(--propia-suave); }
+.ec .sep { height: 6px; }
+.nota { font-size: 13px; color: var(--tinta-2); margin: 0; }
+@media (max-width: 520px) { .ec .linea { font-size: 15px; } }
+</style>
+
+<nav style="max-width:980px;margin:0 auto;padding:14px 16px 0;font-family:Lexend,Arial,sans-serif;font-size:15px;display:flex;gap:16px;flex-wrap:wrap"><a href="ei-5-4.html" style="color:#1f4fd1;font-weight:600;text-decoration:none">← Volver al tema EI-5.4</a><a href="interactivos.html" style="color:#44546a;text-decoration:none">Todos los interactivos</a><a href="index.html" style="color:#44546a;text-decoration:none">Aula Centroide</a></nav>
+<div class="pagina">
+  <header>
+    <span class="materia">Estructuras isostáticas · Propiedades de secciones</span>
+    <h1>Centroide e inercia de secciones compuestas</h1>
+    <p class="indicacion">Elige la forma y cambia sus medidas en centímetros. La sección se divide en rectángulos; observa cómo se mueve el centroide y cuánto aporta cada parte a la inercia gracias al teorema de los ejes paralelos.</p>
+  </header>
+
+  <section class="controles" aria-label="Forma y medidas de la sección">
+    <div class="control ancho">
+      <span class="rotulo">Forma</span>
+      <div class="segmento" id="s-forma" role="group" aria-label="Forma de la sección"></div>
+    </div>
+    <div id="medidas" style="display:contents"></div>
+    <div class="control">
+      <span class="rotulo">Eje de análisis</span>
+      <div class="segmento" id="s-eje" role="group" aria-label="Eje de análisis">
+        <button data-v="x">Horizontal <i>x</i></button><button data-v="y">Vertical <i>y</i></button>
+      </div>
+    </div>
+    <p class="aviso" id="aviso" hidden></p>
+    <div class="opciones">
+      <label><input type="checkbox" id="o-d" checked> <span>Mostrar las distancias <i>d</i> de cada parte al eje centroidal</span></label>
+      <label><input type="checkbox" id="o-cotas" checked> Mostrar cotas</label>
+    </div>
+  </section>
+
+  <div class="cuerpo">
+    <section class="figuras" aria-label="Sección y tabla">
+      <div class="tarjeta">
+        <h2>Sección dividida en rectángulos</h2>
+        <svg class="dibujo" id="svg-sec" viewBox="0 0 800 470" role="img" aria-label="Sección compuesta con su centroide y ejes centroidales"></svg>
+        <div class="leyenda">
+          <span><i style="background:var(--centroide-suave);border:1.5px solid var(--centroide)"></i>Centroide y ejes centroidales</span>
+          <span><i style="background:#fff;border:1.5px solid var(--parte);border-radius:50%"></i>Parte (rectángulo)</span>
+          <span><i style="background:var(--steiner)"></i>Distancia <em>d</em></span>
+        </div>
+      </div>
+      <div class="tarjeta">
+        <h2>¿De dónde sale la inercia? <span class="sim" style="font-weight:400" id="t-aporte"></span></h2>
+        <svg class="dibujo" id="svg-ap" viewBox="0 0 800 160" role="img" aria-label="Aporte de cada parte a la inercia"></svg>
+        <div class="leyenda">
+          <span><i style="background:var(--propia-suave);border:1.5px solid var(--propia)"></i>Inercia propia <span class="sim">bh³/12</span></span>
+          <span><i style="background:var(--steiner-suave);border:1.5px solid var(--steiner)"></i>Traslado <span class="sim">A·d²</span></span>
+        </div>
+      </div>
+      <div class="tarjeta">
+        <h2>Tabla de cálculo</h2>
+        <div class="tabla-envoltura"><table class="calc" id="tabla"></table></div>
+        <p class="nota" style="margin-top:6px" id="t-nota"></p>
+      </div>
+    </section>
+
+    <aside class="tarjeta pasos" aria-label="Cálculo paso a paso">
+      <div class="paso"><h3>Datos</h3><div class="ec" id="e-datos"></div></div>
+      <div class="paso"><h3>1 · Área de cada parte</h3><div class="ec" id="e-A"></div></div>
+      <div class="paso"><h3>2 · Centroide</h3><p id="t-cen"></p><div class="ec" id="e-cen"></div></div>
+      <div class="paso"><h3 id="h-I">3 · Inercia de cada parte (Steiner)</h3><p>Inercia propia respecto a su centroide más el traslado al eje centroidal de toda la sección:</p><div class="ec" id="e-I"></div></div>
+      <div class="paso"><h3>4 · Inercia de la sección</h3><div class="ec" id="e-It"></div></div>
+      <div class="paso"><h3>5 · Módulo de sección y radio de giro</h3><div class="ec" id="e-S"></div></div>
+      <div class="paso"><h3>Resumen (ambos ejes)</h3><div class="ec" id="e-res"></div>
+        <p class="nota" style="margin-top:6px">Medidas en cm. <i>ȳ</i> se mide desde la base y <i>x̄</i> desde el borde izquierdo. Los valores parciales se redondean como en la tabla; las sumas usan esos valores.</p></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmt = (v, d = 0) => {
+    const s = Math.abs(v) < 1e-9 ? 0 : v;
+    return s.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/,/g, "\u202F").replace("-", "\u2212");
+  };
+  const rd = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
+  const tex = (v, d = 0) => fmt(v, d).replace(/\u202F/g, "\\,").replace("\u2212", "-");
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // ---------------- formas: medidas y división en rectángulos (x, y desde la esquina inferior izquierda) ----------------
+  const M = (k, nombre, sim, min, max, paso, def) => ({ k, nombre, sim, min, max, paso, def });
+  const FORMAS = {
+    rect: { nombre: "Rectángulo", icono: "M4 3h10v12H4z",
+      medidas: [M("b", "Base", "b", 2, 60, 0.5, 15), M("h", "Altura", "h", 2, 80, 0.5, 30)],
+      partes: (p) => [["Rectángulo", 0, 0, p.b, p.h]] },
+    T: { nombre: "T", icono: "M2 3h14v4h-5v9H7V7H2z",
+      medidas: [M("bf", "Ancho del patín", "b_f", 4, 60, 0.5, 20), M("tf", "Espesor del patín", "t_f", 0.5, 15, 0.5, 4),
+                M("tw", "Espesor del alma", "t_w", 0.5, 20, 0.5, 4), M("hw", "Altura del alma", "h_w", 2, 70, 0.5, 16)],
+      ajustar: (p) => { p.tw = Math.min(p.tw, p.bf); },
+      partes: (p) => [["Alma", (p.bf - p.tw) / 2, 0, p.tw, p.hw], ["Patín", 0, p.hw, p.bf, p.tf]] },
+    I: { nombre: "I", icono: "M3 2h12v3h-4.5v8H15v3H3v-3h4.5V5H3z",
+      medidas: [M("b1", "Patín superior: ancho", "b_1", 2, 60, 0.5, 20), M("t1", "Patín superior: espesor", "t_1", 0.5, 15, 0.5, 3),
+                M("tw", "Espesor del alma", "t_w", 0.5, 20, 0.5, 2), M("hw", "Altura del alma", "h_w", 2, 70, 0.5, 26),
+                M("b2", "Patín inferior: ancho", "b_2", 2, 60, 0.5, 14), M("t2", "Patín inferior: espesor", "t_2", 0.5, 15, 0.5, 3)],
+      ajustar: (p) => { p.tw = Math.min(p.tw, p.b1, p.b2); },
+      partes: (p) => { const B = Math.max(p.b1, p.b2); return [["Patín inferior", (B - p.b2) / 2, 0, p.b2, p.t2], ["Alma", (B - p.tw) / 2, p.t2, p.tw, p.hw], ["Patín superior", (B - p.b1) / 2, p.t2 + p.hw, p.b1, p.t1]]; } },
+    U: { nombre: "Canal", icono: "M2 3h4v9h6V3h4v13H2z",
+      medidas: [M("b", "Ancho de la base", "b", 4, 60, 0.5, 20), M("tb", "Espesor de la base", "t_b", 0.5, 15, 0.5, 3),
+                M("ta", "Espesor de las alas", "t_a", 0.5, 15, 0.5, 3), M("ha", "Altura de las alas", "h_a", 1, 60, 0.5, 12)],
+      ajustar: (p) => { p.ta = Math.min(p.ta, p.b / 2 - 0.5); },
+      partes: (p) => [["Base", 0, 0, p.b, p.tb], ["Ala izquierda", 0, p.tb, p.ta, p.ha], ["Ala derecha", p.b - p.ta, p.tb, p.ta, p.ha]] },
+    caj: { nombre: "Cajón", icono: "M2 2h14v14H2zM5 5v8h8V5z",
+      medidas: [M("B", "Ancho exterior", "B", 4, 60, 0.5, 20), M("H", "Altura exterior", "H", 4, 80, 0.5, 30), M("t", "Espesor de las paredes", "t", 0.5, 10, 0.5, 2)],
+      ajustar: (p) => { p.t = Math.min(p.t, Math.min(p.B, p.H) / 2 - 0.5); },
+      partes: (p) => [["Placa inferior", 0, 0, p.B, p.t], ["Pared izquierda", 0, p.t, p.t, p.H - 2 * p.t], ["Pared derecha", p.B - p.t, p.t, p.t, p.H - 2 * p.t], ["Placa superior", 0, p.H - p.t, p.B, p.t]] },
+    L: { nombre: "Ángulo L", icono: "M3 2h4v10h9v4H3z",
+      medidas: [M("b", "Largo del ala horizontal", "b", 2, 50, 0.5, 15), M("h", "Largo del ala vertical", "h", 2, 50, 0.5, 15), M("t", "Espesor", "t", 0.5, 10, 0.5, 2)],
+      ajustar: (p) => { p.t = Math.min(p.t, Math.min(p.b, p.h) - 0.5); },
+      partes: (p) => [["Ala horizontal", 0, 0, p.b, p.t], ["Ala vertical", 0, p.t, p.t, p.h - p.t]] },
+  };
+  const estado = { forma: "T", eje: "x", verD: true, cotas: true, sel: null, med: {} };
+  for (const [f, F] of Object.entries(FORMAS)) estado.med[f] = Object.fromEntries(F.medidas.map((m) => [m.k, m.def]));
+
+  // ---------------- cálculo (única fuente de los números) ----------------
+  // Valores exactos para el dibujo; valores redondeados como en un cálculo a mano para la tabla y las fórmulas.
+  function resolver(e) {
+    const F = FORMAS[e.forma], p = { ...e.med[e.forma] };
+    const ajustado = JSON.stringify(p);
+    if (F.ajustar) F.ajustar(p);
+    const partes = F.partes(p).map(([nombre, x, y, b, h], i) => ({ i: i + 1, nombre, x, y, b, h, A: b * h, xc: x + b / 2, yc: y + h / 2, Ix0: b * h ** 3 / 12, Iy0: h * b ** 3 / 12 }));
+    const A = partes.reduce((s, q) => s + q.A, 0);
+    const B = Math.max(...partes.map((q) => q.x + q.b)), H = Math.max(...partes.map((q) => q.y + q.h));
+    const xb = partes.reduce((s, q) => s + q.A * q.xc, 0) / A, yb = partes.reduce((s, q) => s + q.A * q.yc, 0) / A;
+    const Ix = partes.reduce((s, q) => s + q.Ix0 + q.A * (q.yc - yb) ** 2, 0), Iy = partes.reduce((s, q) => s + q.Iy0 + q.A * (q.xc - xb) ** 2, 0);
+    // cálculo "a mano" para el eje elegido
+    const ejeX = e.eje === "x";
+    const filas = partes.map((q) => ({ ...q, Ar: rd(q.A, 2), cr: rd(ejeX ? q.yc : q.xc, 2), I0r: rd(ejeX ? q.Ix0 : q.Iy0, 1) }));
+    filas.forEach((f) => (f.Acr = rd(f.Ar * f.cr, 1)));
+    const SA = rd(filas.reduce((s, f) => s + f.Ar, 0), 2), SAc = rd(filas.reduce((s, f) => s + f.Acr, 0), 1);
+    const cbar = rd(SAc / SA, 2);
+    filas.forEach((f) => { f.d = rd(f.cr - cbar, 2); f.Ad2 = rd(f.Ar * f.d * f.d, 1); f.It = rd(f.I0r + f.Ad2, 1); });
+    const SI0 = rd(filas.reduce((s, f) => s + f.I0r, 0), 1), SAd2 = rd(filas.reduce((s, f) => s + f.Ad2, 0), 1);
+    const I = rd(SI0 + SAd2, 1);
+    const ext = ejeX ? H : B;
+    const c1 = rd(ext - cbar, 2), c2 = cbar;                  // fibra superior (o derecha) e inferior (o izquierda)
+    const S1 = rd(I / c1, 1), S2 = rd(I / c2, 1), r = rd(Math.sqrt(I / SA), 2);
+    const simX = Math.abs(xb - B / 2) < 1e-9, simY = Math.abs(yb - H / 2) < 1e-9;
+    return { ...e, F, p, ajuste: JSON.stringify(p) !== ajustado, partes, A, B, H, xb, yb, Ix, Iy, filas, SA, SAc, cbar, SI0, SAd2, I, c1, c2, S1, S2, r, ejeX, simX, simY,
+             Sx: [Ix / (H - yb), Ix / yb], Sy: [Iy / (B - xb), Iy / xb], rx: Math.sqrt(Ix / A), ry: Math.sqrt(Iy / A) };
+  }
+
+  // ---------------- dibujo ----------------
+  let W = 800, H = 470;
+  function medir() {
+    const ancho = $("svg-sec").getBoundingClientRect().width || 800;
+    W = ancho < 600 ? 480 : 800; H = W < 800 ? 420 : 470;
+    $("svg-sec").setAttribute("viewBox", `0 0 ${W} ${H}`);
+    $("svg-ap").setAttribute("viewBox", `0 0 ${W} ${apAlto()}`);
+  }
+  const el = (tag, attrs = {}, padre) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [a, v] of Object.entries(attrs)) n.setAttribute(a, v);
+    if (padre) padre.appendChild(n);
+    return n;
+  };
+  const texto = (padre, x, y, t, attrs = {}) => { const n = el("text", { x, y, ...attrs }, padre); n.textContent = t; return n; };
+  function etiqueta(padre, x, y, html, color, { ancla = "middle", tam = 14, relleno = "#fff", grosor = 1.3, giro = 0 } = {}) {
+    const g = el("g", giro ? { transform: `rotate(${giro} ${x} ${y})` } : {}, padre);
+    const t = el("text", { x, y, "text-anchor": ancla, "dominant-baseline": "central", "font-size": tam, "font-weight": 700, fill: color }, g);
+    t.innerHTML = html;
+    const b = t.getBBox();
+    g.insertBefore(el("rect", { x: b.x - 7, y: b.y - 3, width: b.width + 14, height: b.height + 6, rx: (b.height + 6) / 2, fill: relleno, stroke: color, "stroke-width": grosor }), t);
+    return g;
+  }
+  const punta = (x, y, ang, c, padre, t = 8) => el("polygon", { points: `${x},${y} ${x - t * Math.cos(ang) + t * .45 * Math.sin(ang)},${y - t * Math.sin(ang) - t * .45 * Math.cos(ang)} ${x - t * Math.cos(ang) - t * .45 * Math.sin(ang)},${y - t * Math.sin(ang) + t * .45 * Math.cos(ang)}`, fill: c }, padre);
+  // cota de dibujo técnico entre dos puntos (horizontal o vertical), con texto en recuadro
+  function cota(padre, x1, y1, x2, y2, html, c, { giro = 0, tam = 13 } = {}) {
+    const lg = Math.hypot(x2 - x1, y2 - y1); if (lg < 3) return;
+    el("line", { x1, y1, x2, y2, stroke: c, "stroke-width": 1 }, padre);
+    if (lg > 18) { const a = Math.atan2(y2 - y1, x2 - x1); punta(x2, y2, a, c, padre); punta(x1, y1, a + Math.PI, c, padre); }
+    if (lg > (giro ? 70 : 64)) etiqueta(padre, (x1 + x2) / 2, (y1 + y2) / 2, html, c, { tam, giro });
+  }
+  function simboloCentroide(padre, x, y, r, C) {
+    el("circle", { cx: x, cy: y, r: r + 3, fill: "#fff", opacity: .9 }, padre);
+    el("circle", { cx: x, cy: y, r, fill: "#fff", stroke: C.tinta, "stroke-width": 1.6 }, padre);
+    el("path", { d: `M${x},${y} L${x + r},${y} A${r},${r} 0 0 0 ${x},${y - r} Z M${x},${y} L${x - r},${y} A${r},${r} 0 0 0 ${x},${y + r} Z`, fill: C.tinta }, padre);
+  }
+
+  function dibujar(s) {
+    const svg = $("svg-sec"); svg.textContent = "";
+    const C = { tinta: css("--tinta"), t2: css("--tinta-2"), parte: css("--parte"), parteS: css("--parte-suave"), cen: css("--centroide"), cenS: css("--centroide-suave"), st: css("--steiner"), stS: css("--steiner-suave"), ret: css("--reticula") };
+    const chico = W < 800;
+    el("defs", {}, svg).innerHTML = `
+      <linearGradient id="g-acero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3eaf2"/><stop offset=".55" stop-color="#c7d4e3"/><stop offset="1" stop-color="#a9bbd0"/></linearGradient>
+      <pattern id="p-ret" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="${C.ret}" stroke-width="1"/></pattern>
+      <filter id="f-sombra" x="-10%" y="-10%" width="125%" height="125%"><feDropShadow dx="2" dy="3" stdDeviation="2.5" flood-color="#1f2a37" flood-opacity=".2"/></filter>`;
+    el("rect", { x: 0, y: 0, width: W, height: H, fill: "url(#p-ret)", opacity: .55 }, svg);
+    // escala: la sección cabe en la zona central dejando aire para cotas y ejes
+    const mx0 = chico ? 66 : 120, mx1 = chico ? 66 : 150, my0 = 44, my1 = chico ? 92 : 104;
+    const k = Math.min((W - mx0 - mx1) / s.B, (H - my0 - my1) / s.H);
+    const ox = mx0 + (W - mx0 - mx1 - s.B * k) / 2, oy = my0 + (H - my0 - my1 + s.H * k) / 2;
+    const X = (x) => ox + x * k, Y = (y) => oy - y * k;
+
+    // partes: un solo cuerpo con sombra, y luego las líneas que dividen los rectángulos
+    const cuerpo = el("g", { filter: "url(#f-sombra)" }, svg);
+    for (const q of s.partes) el("rect", { x: X(q.x), y: Y(q.y + q.h), width: q.b * k, height: q.h * k, fill: "url(#g-acero)" }, cuerpo);
+    for (const q of s.partes) {
+      const sel = s.sel === q.i;
+      const r = el("rect", { x: X(q.x), y: Y(q.y + q.h), width: q.b * k, height: q.h * k, fill: sel ? C.cenS : "transparent", "fill-opacity": sel ? .7 : 0, stroke: C.parte, "stroke-width": sel ? 2.4 : 1.2, "stroke-dasharray": sel ? "none" : "5 4", style: "cursor:pointer" }, svg);
+      r.addEventListener("pointerdown", () => { estado.sel = estado.sel === q.i ? null : q.i; actualizar(); });
+    }
+    // contorno exterior grueso (borde de cada rectángulo que no toca a otro)
+    for (const q of s.partes) {
+      const lados = [[q.x, q.y, q.x + q.b, q.y], [q.x, q.y + q.h, q.x + q.b, q.y + q.h], [q.x, q.y, q.x, q.y + q.h], [q.x + q.b, q.y, q.x + q.b, q.y + q.h]];
+      for (const [x1, y1, x2, y2] of lados) {
+        // tramos del lado cubiertos por otra parte (se omiten)
+        const horiz = y1 === y2, a0 = horiz ? x1 : y1, a1 = horiz ? x2 : y2;
+        let cortes = [[a0, a1]];
+        for (const o of s.partes) if (o !== q) {
+          const toca = horiz ? (Math.abs(o.y - y1) < 1e-9 || Math.abs(o.y + o.h - y1) < 1e-9) : (Math.abs(o.x - x1) < 1e-9 || Math.abs(o.x + o.b - x1) < 1e-9);
+          if (!toca) continue;
+          const [b0, b1] = horiz ? [o.x, o.x + o.b] : [o.y, o.y + o.h];
+          cortes = cortes.flatMap(([c0, c1]) => { const out = []; if (b0 > c0) out.push([c0, Math.min(c1, b0)]); if (b1 < c1) out.push([Math.max(c0, b1), c1]); return out.filter(([u, v]) => v - u > 1e-9); });
+        }
+        for (const [c0, c1] of cortes) el("line", horiz ? { x1: X(c0), y1: Y(y1), x2: X(c1), y2: Y(y1) } : { x1: X(x1), y1: Y(c0), x2: X(x1), y2: Y(c1) }, svg).setAttribute("style", `stroke:${C.tinta};stroke-width:2;stroke-linecap:square`);
+      }
+    }
+
+    // ejes centroidales y centroide
+    const cx = X(s.xb), cy = Y(s.yb);
+    const ejeX = el("line", { x1: X(0) - 34, y1: cy, x2: X(s.B) + 34, y2: cy, stroke: C.cen, "stroke-width": s.ejeX ? 2.2 : 1.3, "stroke-dasharray": "10 4 2 4" }, svg);
+    el("line", { x1: cx, y1: Y(s.H) - 30, x2: cx, y2: Y(0) + 30, stroke: C.cen, "stroke-width": s.ejeX ? 1.3 : 2.2, "stroke-dasharray": "10 4 2 4" }, svg);
+    texto(svg, X(s.B) + 40, cy + 5, "x", { "font-size": 17, "font-style": "italic", "font-weight": 700, fill: C.cen });
+    texto(svg, cx + 6, Y(s.H) - 34, "y", { "font-size": 17, "font-style": "italic", "font-weight": 700, fill: C.cen });
+
+    // distancias d de cada parte al eje elegido (en verde)
+    if (s.verD) for (const f of s.filas) {
+      if (Math.abs(f.d) < 0.005) continue;
+      if (s.ejeX) {
+        const x = X(f.xc) + (s.partes.length > 1 ? Math.min(28, f.b * k / 2 - 4 > 18 ? 28 : 22) : 24), y1 = cy, y2 = Y(f.yc);
+        if (Math.abs(y2 - y1) < 10) continue;
+        el("line", { x1: x, y1, x2: x, y2, stroke: C.st, "stroke-width": 2 }, svg);
+        punta(x, y2, Math.atan2(y2 - y1, 0), C.st, svg, 8); punta(x, y1, Math.atan2(y1 - y2, 0), C.st, svg, 8);
+        if (Math.abs(y2 - y1) > 30) etiqueta(svg, x + 6, (y1 + y2) / 2, `<tspan font-style="italic">d</tspan><tspan font-size="10" dy="4">${f.i}</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(Math.abs(f.d), 2)}</tspan>`, C.st, { ancla: "start", tam: chico ? 11.5 : 12.5, relleno: C.stS });
+      } else {
+        const y = Y(f.yc) - (f.h * k > 40 ? 22 : 16), x1 = cx, x2 = X(f.xc);
+        if (Math.abs(x2 - x1) < 10) continue;
+        el("line", { x1, y1: y, x2, y2: y, stroke: C.st, "stroke-width": 2 }, svg);
+        punta(x2, y, Math.atan2(0, x2 - x1), C.st, svg, 8); punta(x1, y, Math.atan2(0, x1 - x2), C.st, svg, 8);
+        if (Math.abs(x2 - x1) > 50) etiqueta(svg, (x1 + x2) / 2, y - 14, `<tspan font-style="italic">d</tspan><tspan font-size="10" dy="4">${f.i}</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(Math.abs(f.d), 2)}</tspan>`, C.st, { tam: chico ? 11.5 : 12.5, relleno: C.stS });
+      }
+    }
+    // insignias de las partes (en su centroide) con sus medidas
+    for (const q of s.partes) {
+      const x = X(q.xc), y = Y(q.yc), sel = s.sel === q.i;
+      el("circle", { cx: x, cy: y, r: 12, fill: "#fff", stroke: sel ? C.cen : C.parte, "stroke-width": 2 }, svg);
+      texto(svg, x, y + 5, String(q.i), { "text-anchor": "middle", "font-size": 14, "font-weight": 700, fill: sel ? C.cen : C.parte });
+      const alto = q.h * k, anchoP = q.b * k;
+      const txt = `${fmt(q.b, q.b % 1 ? 1 : 0)} × ${fmt(q.h, q.h % 1 ? 1 : 0)}`;
+      if (alto > 78 && anchoP > 60) texto(svg, x, y + 30, txt, { "text-anchor": "middle", "font-size": chico ? 11.5 : 12.5, fill: C.t2, class: "num" });
+      else if (anchoP > 120) texto(svg, x - 20, y + 5, txt, { "text-anchor": "end", "font-size": chico ? 11.5 : 12.5, fill: C.t2, class: "num" });
+    }
+    simboloCentroide(svg, cx, cy, chico ? 9 : 11, C);
+
+    // cotas: ancho y alto totales, y ubicación del centroide desde la base y el borde izquierdo
+    if (s.cotas) {
+      const ct = C.t2, yB = Y(0) + (chico ? 62 : 70), xH = X(s.B) + (chico ? 24 : 70);
+      for (const xx of [X(0), X(s.B)]) el("line", { x1: xx, y1: Y(0) + 6, x2: xx, y2: yB + 6, stroke: ct, "stroke-width": .7 }, svg);
+      cota(svg, X(0), yB, X(s.B), yB, `<tspan class="num">${fmt(s.B, 2)}</tspan> cm`, ct, { tam: chico ? 11.5 : 13 });
+      for (const yy of [Y(0), Y(s.H)]) el("line", { x1: X(s.B) + 6, y1: yy, x2: xH + 6, y2: yy, stroke: ct, "stroke-width": .7 }, svg);
+      cota(svg, xH, Y(0), xH, Y(s.H), `<tspan class="num">${fmt(s.H, 2)}</tspan> cm`, ct, { giro: -90, tam: chico ? 11.5 : 13 });
+      // ȳ desde la base y x̄ desde el borde izquierdo (en el color del centroide)
+      const xY = X(0) - (chico ? 30 : 46), yX = Y(0) + (chico ? 32 : 36);
+      el("line", { x1: X(0) - 6, y1: Y(0), x2: xY - 6, y2: Y(0), stroke: C.cen, "stroke-width": .8 }, svg);
+      el("line", { x1: X(0) - 34, y1: cy, x2: xY - 6, y2: cy, stroke: C.cen, "stroke-width": .8 }, svg);
+      cota(svg, xY, Y(0), xY, cy, `<tspan font-style="italic">ȳ</tspan> = <tspan class="num">${fmt(s.ejeX ? s.cbar : s.yb, 2)}</tspan>`, C.cen, { giro: -90, tam: chico ? 11.5 : 13 });
+      el("line", { x1: cx, y1: Y(0) + 30, x2: cx, y2: yX + 6, stroke: C.cen, "stroke-width": .8 }, svg);
+      el("line", { x1: X(0), y1: Y(0) + 6, x2: X(0), y2: yX + 6, stroke: C.cen, "stroke-width": .8 }, svg);
+      cota(svg, X(0), yX, cx, yX, `<tspan font-style="italic">x̄</tspan> = <tspan class="num">${fmt(s.ejeX ? s.xb : s.cbar, 2)}</tspan>`, C.cen, { tam: chico ? 11.5 : 13 });
+    }
+  }
+
+  // ---------------- gráfica de aportes ----------------
+  const apAlto = () => 34 + 34 * (FORMAS[estado.forma].partes(estado.med[estado.forma]).length + 1);
+  function aportes(s) {
+    const svg = $("svg-ap"); const h = apAlto(); svg.setAttribute("viewBox", `0 0 ${W} ${h}`); svg.textContent = "";
+    const C = { t2: css("--tinta-2"), tinta: css("--tinta"), p: css("--propia"), pS: css("--propia-suave"), st: css("--steiner"), stS: css("--steiner-suave"), cen: css("--centroide"), ret: css("--reticula") };
+    const chico = W < 800, x0 = chico ? 104 : 150, x1 = W - (chico ? 16 : 30);
+    const kx = (x1 - x0) / Math.max(s.I, 1e-9);
+    $("t-aporte").textContent = `(${s.ejeX ? "eje x" : "eje y"}, cm⁴)`;
+    const filas = [...s.filas.map((f) => [`${f.i} · ${f.nombre}`, f.I0r, f.Ad2, f.i]), [chico ? "Total" : "Sección completa", s.SI0, s.SAd2, 0]];
+    filas.forEach(([nom, a, b, i], j) => {
+      const y = 22 + j * 34, total = j === filas.length - 1;
+      const t = texto(svg, x0 - 10, y + 15, nom, { "text-anchor": "end", "font-size": chico ? 12 : 14, "font-weight": total ? 700 : 400, fill: i && s.sel === i ? C.cen : C.tinta });
+      if (chico && i && nom.length > 13) t.textContent = nom.split(" · ")[0] + " · " + nom.split(" · ")[1].slice(0, 9) + "…";
+      el("line", { x1: x0, y1: y - 4, x2: x0, y2: y + 30, stroke: C.ret }, svg);
+      const wa = a * kx, wb = b * kx;
+      el("rect", { x: x0, y, width: Math.max(wa, 0.5), height: 24, fill: C.pS, stroke: C.p, "stroke-width": 1.3, rx: 3 }, svg);
+      el("rect", { x: x0 + wa, y, width: Math.max(wb, 0.5), height: 24, fill: C.stS, stroke: C.st, "stroke-width": 1.3, rx: 3 }, svg);
+      const pct = s.I > 0 ? Math.round(((a + b) / s.I) * 100) : 0;
+      const etq = `${fmt(a + b, 1)}${total ? "" : `  (${pct} %)`}`;
+      const fuera = x0 + wa + wb + 8 + etq.length * 7.2 < x1;
+      texto(svg, fuera ? x0 + wa + wb + 8 : x0 + wa + wb - 8, y + 17, etq, { "text-anchor": fuera ? "start" : "end", "font-size": chico ? 11.5 : 13, class: "num", "font-weight": 700, fill: C.tinta });
+    });
+  }
+
+  // ---------------- tabla ----------------
+  function tabla(s) {
+    const c = s.ejeX ? "ȳ" : "x̄", I0 = s.ejeX ? "b h³/12" : "h b³/12";
+    let html = `<thead><tr><th>Parte</th><th>b × h</th><th>A (cm²)</th><th>${c}<sub>i</sub> (cm)</th><th>A ${c}<sub>i</sub> (cm³)</th><th>${I0} (cm⁴)</th><th>d (cm)</th><th>A d² (cm⁴)</th><th>I (cm⁴)</th></tr></thead><tbody>`;
+    for (const f of s.filas) html += `<tr class="parte${s.sel === f.i ? " sel" : ""}" data-i="${f.i}"><td><span class="insignia">${f.i}</span>${f.nombre}</td><td>${fmt(f.b, 1)} × ${fmt(f.h, 1)}</td><td>${fmt(f.Ar, 2)}</td><td>${fmt(f.cr, 2)}</td><td>${fmt(f.Acr, 1)}</td><td>${fmt(f.I0r, 1)}</td><td>${fmt(f.d, 2)}</td><td>${fmt(f.Ad2, 1)}</td><td>${fmt(f.It, 1)}</td></tr>`;
+    html += `<tr class="total"><td>Suma</td><td></td><td>${fmt(s.SA, 2)}</td><td></td><td>${fmt(s.SAc, 1)}</td><td>${fmt(s.SI0, 1)}</td><td></td><td>${fmt(s.SAd2, 1)}</td><td>${fmt(s.I, 1)}</td></tr>`;
+    $("tabla").innerHTML = html + "</tbody>";
+    $("t-nota").innerHTML = `${c}<sub>i</sub> se mide desde ${s.ejeX ? "la base" : "el borde izquierdo"}; <i>d</i> = ${c}<sub>i</sub> − ${c}: negativo si la parte queda ${s.ejeX ? "abajo" : "a la izquierda"} del eje centroidal (al elevarlo al cuadrado el signo no importa).`;
+  }
+  $("tabla").addEventListener("click", (ev) => { const tr = ev.target.closest("tr.parte"); if (!tr) return; const i = +tr.dataset.i; estado.sel = estado.sel === i ? null : i; actualizar(); });
+
+  // ---------------- fórmulas ----------------
+  const cache = new Map();
+  function aSvg(latex) { let n = cache.get(latex); if (!n) { n = MathJax.tex2svg(latex, { display: false }); cache.set(latex, n); if (cache.size > 800) cache.clear(); } return n.cloneNode(true); }
+  function poner(id, lineas) {
+    const nodo = $(id), clave = JSON.stringify(lineas);
+    if (nodo.dataset.tex === clave) return;
+    if (!window.MathJax || !MathJax.tex2svg) return;
+    nodo.dataset.tex = clave;
+    nodo.replaceChildren(...lineas.map((l) => {
+      if (l === "") { const d = document.createElement("div"); d.className = "sep"; return d; }
+      const [latex, clase] = Array.isArray(l) ? l : [l, ""];
+      const d = document.createElement("div"); d.className = "linea " + clase; d.appendChild(aSvg(latex)); return d;
+    }));
+  }
+  const cm = "\\ \\text{cm}", cm2 = "\\ \\text{cm}^2", cm3 = "\\ \\text{cm}^3", cm4 = "\\ \\text{cm}^4";
+  const n2 = (v) => tex(v, v % 1 ? (Math.abs(v * 10 - Math.round(v * 10)) < 1e-9 ? 1 : 2) : 0);
+  function escribir(s) {
+    const F = s.F, p = s.p;
+    poner("e-datos", [`\\text{Sección ${F.nombre}}`, ...F.medidas.reduce((acc, m, i) => {
+      const t = `${m.sim} = ${n2(p[m.k])}${cm}`; if (i % 2 === 0) acc.push(t); else acc[acc.length - 1] += ` \\qquad ${t}`; return acc; }, [])]);
+    poner("e-A", [...s.filas.map((f) => `A_{${f.i}} = (${n2(f.b)})(${n2(f.h)}) = ${tex(f.Ar, 2)}${cm2}`),
+      [`A = \\textstyle\\sum A_i = ${tex(s.SA, 2)}${cm2}`, "fin s"]]);
+    const c = s.ejeX ? "\\bar{y}" : "\\bar{x}", ci = s.ejeX ? "\\bar{y}_i" : "\\bar{x}_i";
+    const sim = s.ejeX ? s.simY : s.simX;
+    $("t-cen").innerHTML = s.ejeX
+      ? `Distancia del centroide a la base. ${s.simX ? `Por simetría, <i>x̄</i> = ${fmt(s.B / 2, 2)} cm.` : ""}`
+      : `Distancia del centroide al borde izquierdo. ${s.simY ? `Por simetría, <i>ȳ</i> = ${fmt(s.H / 2, 2)} cm.` : ""}`;
+    poner("e-cen", [
+      ...s.filas.map((f) => `A_{${f.i}}\\,${c}_{${f.i}} = (${tex(f.Ar, 2)})(${tex(f.cr, 2)}) = ${tex(f.Acr, 1)}${cm3}`),
+      `${c} = \\dfrac{\\sum A_i\\,${ci}}{\\sum A_i} = \\dfrac{${tex(s.SAc, 1)}${cm3}}{${tex(s.SA, 2)}${cm2}}`,
+      [`${c} = ${tex(s.cbar, 2)}${cm}${sim ? "\\ \\ (\\text{eje de simetría})" : ""}`, "fin"],
+    ]);
+    const I0f = s.ejeX ? "\\dfrac{b\\,h^3}{12}" : "\\dfrac{h\\,b^3}{12}";
+    $("h-I").textContent = `3 · Inercia de cada parte respecto al eje ${s.ejeX ? "x" : "y"} (Steiner)`;
+    const lineas = [`I_i = ${I0f} + A_i\\,d_i^{\\,2} \\qquad d_i = ${ci} - ${c}`];
+    for (const f of s.filas) {
+      lineas.push("");
+      const b = n2(f.b), h = n2(f.h);
+      lineas.push(s.ejeX ? `\\bar{I}_{${f.i}} = \\dfrac{(${b})(${h})^3}{12} = ${tex(f.I0r, 1)}` : `\\bar{I}_{${f.i}} = \\dfrac{(${h})(${b})^3}{12} = ${tex(f.I0r, 1)}`);
+      lineas.push(`A_{${f.i}}\\,d_{${f.i}}^{\\,2} = (${tex(f.Ar, 2)})(${tex(f.d, 2)})^2 = ${tex(f.Ad2, 1)}`);
+      lineas.push([`I_{${f.i}} = ${tex(f.I0r, 1)} + ${tex(f.Ad2, 1)} = ${tex(f.It, 1)}${cm4}`, "fin i"]);
+    }
+    poner("e-I", lineas);
+    const Ie = s.ejeX ? "I_x" : "I_y";
+    poner("e-It", [
+      `${Ie} = \\textstyle\\sum I_i = ${s.filas.length <= 4 ? s.filas.map((f) => tex(f.It, 1)).join(" + ") : "\\cdots"}`,
+      [`${Ie} = ${tex(s.I, 1)}${cm4}`, "fin i"],
+    ]);
+    const [n1, n2_] = s.ejeX ? ["sup", "inf"] : ["der", "izq"];
+    const re = s.ejeX ? "r_x" : "r_y";
+    poner("e-S", [
+      s.ejeX ? `c_{\\text{sup}} = H - \\bar{y} = ${n2(s.H)} - ${tex(s.cbar, 2)} = ${tex(s.c1, 2)}${cm}` : `c_{\\text{der}} = B - \\bar{x} = ${n2(s.B)} - ${tex(s.cbar, 2)} = ${tex(s.c1, 2)}${cm}`,
+      s.ejeX ? `c_{\\text{inf}} = \\bar{y} = ${tex(s.c2, 2)}${cm}` : `c_{\\text{izq}} = \\bar{x} = ${tex(s.c2, 2)}${cm}`,
+      `S_{\\text{${n1}}} = \\dfrac{${Ie}}{c_{\\text{${n1}}}} = \\dfrac{${tex(s.I, 1)}}{${tex(s.c1, 2)}} = ${tex(s.S1, 1)}${cm3}`,
+      `S_{\\text{${n2_}}} = \\dfrac{${Ie}}{c_{\\text{${n2_}}}} = \\dfrac{${tex(s.I, 1)}}{${tex(s.c2, 2)}} = ${tex(s.S2, 1)}${cm3}`,
+      [`S_{\\text{mín}} = ${tex(Math.min(s.S1, s.S2), 1)}${cm3}`, "fin s"],
+      `${re} = \\sqrt{\\dfrac{${Ie}}{A}} = \\sqrt{\\dfrac{${tex(s.I, 1)}}{${tex(s.SA, 2)}}}`,
+      [`${re} = ${tex(s.r, 2)}${cm}`, "fin s"],
+    ]);
+    poner("e-res", [
+      `\\bar{x} = ${tex(s.xb, 2)}${cm} \\qquad \\bar{y} = ${tex(s.yb, 2)}${cm}`,
+      `I_x = ${tex(s.Ix, 1)}${cm4} \\qquad I_y = ${tex(s.Iy, 1)}${cm4}`,
+      `r_x = ${tex(s.rx, 2)}${cm} \\qquad r_y = ${tex(s.ry, 2)}${cm}`,
+    ]);
+  }
+
+  // ---------------- controles ----------------
+  function construirControles() {
+    $("s-forma").innerHTML = Object.entries(FORMAS).map(([k, F]) => `<button data-v="${k}"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="${F.icono}" fill="currentColor" fill-rule="evenodd"/></svg>${F.nombre}</button>`).join("");
+    pintarMedidas();
+  }
+  function pintarMedidas() {
+    const F = FORMAS[estado.forma];
+    $("medidas").innerHTML = F.medidas.map((m) => `
+      <div class="control"><div class="control-fila"><label for="m-${m.k}">${m.nombre} <span class="sim">${m.sim.replace(/_(\w+)/, "<sub>$1</sub>")}</span></label>
+      <span class="valor"><input id="m-${m.k}-num" type="number" min="${m.min}" max="${m.max}" step="${m.paso}" aria-label="${m.nombre} en cm"><span>cm</span></span></div>
+      <input id="m-${m.k}" type="range" min="${m.min}" max="${m.max}" step="${m.paso}"></div>`).join("");
+    for (const m of F.medidas) {
+      $("m-" + m.k).addEventListener("input", (e) => fijar(m.k, e.target.value));
+      $("m-" + m.k + "-num").addEventListener("change", (e) => fijar(m.k, e.target.value));
+    }
+  }
+  function fijar(clave, valor) {
+    if (clave === "forma") { if (estado.forma !== valor) { estado.forma = valor; estado.sel = null; pintarMedidas(); medir(); } }
+    else if (clave === "eje") estado.eje = valor;
+    else {
+      const m = FORMAS[estado.forma].medidas.find((q) => q.k === clave); if (!m) return;
+      const v = Number(valor); if (!Number.isFinite(v)) return;
+      estado.med[estado.forma][clave] = Math.min(m.max, Math.max(m.min, Math.round(v / m.paso) * m.paso));
+    }
+    sincronizar(); actualizar();
+  }
+  function sincronizar() {
+    for (const m of FORMAS[estado.forma].medidas) { const v = estado.med[estado.forma][m.k]; $("m-" + m.k).value = v; $("m-" + m.k + "-num").value = v.toFixed(1); }
+    $("s-forma").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === estado.forma)));
+    $("s-eje").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === estado.eje)));
+  }
+  $("s-forma").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) fijar("forma", b.dataset.v); });
+  $("s-eje").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) fijar("eje", b.dataset.v); });
+  $("o-d").addEventListener("change", (e) => { estado.verD = e.target.checked; actualizar(); });
+  $("o-cotas").addEventListener("change", (e) => { estado.cotas = e.target.checked; actualizar(); });
+
+  let pendiente = false;
+  function actualizar() {
+    if (pendiente) return; pendiente = true;
+    requestAnimationFrame(() => {
+      pendiente = false;
+      const s = resolver(estado);
+      const av = $("aviso");
+      av.hidden = !s.ajuste;
+      if (s.ajuste) av.textContent = "Algún espesor era mayor que lo que permite la forma; se dibuja con el máximo posible.";
+      dibujar(s); aportes(s); tabla(s); escribir(s);
+    });
+  }
+
+  construirControles(); medir(); sincronizar(); actualizar();
+  let anchoPrevio = window.innerWidth;
+  window.addEventListener("resize", () => { if (window.innerWidth !== anchoPrevio) { anchoPrevio = window.innerWidth; medir(); actualizar(); } });
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => {
+    if (MathJax.svgStylesheet) document.head.appendChild(MathJax.svgStylesheet());
+    document.querySelectorAll(".ec").forEach((n) => delete n.dataset.tex);
+    actualizar();
+  });
+  window.__sec = { resolver, estado, fijar, FORMAS };
+})();
+</script>
+
+</html>

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2244 419 465 465%22%3E%3Cpath fill=%22%230F2557%22 d=%22M50 645A220 220 0 0 1 270 425V495A150 150 0 0 0 120 645Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M299 629V443A186 186 0 0 1 485 629Z%22/%3E%3Cpath fill=%22%23FF6B00%22 d=%22M254 674V860A186 186 0 0 1 68 674Z%22/%3E%3Cpath fill=%22%230F2557%22 d=%22M503 658A220 220 0 0 1 283 878V808A150 150 0 0 0 433 658Z%22/%3E%3C/svg%3E">
+<title>EI-1.4 · Resultante de cargas distribuidas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+  window.MathJax = { tex: {}, svg: { fontCache: "none" }, startup: { typeset: false } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
+
+<style>
+[hidden] { display: none !important; }
+:root {
+  color-scheme: light;
+  --papel: #f6f8fb; --hoja: #ffffff; --tinta: #1f2a37; --tinta-2: #5b6b7d; --reticula: #e4eaf2; --borde: #d6dee9;
+  --carga: #a3303c; --carga-suave: #f7e1e3;          /* cargas aplicadas (tinto) */
+  --reaccion: #2b8a7e; --reaccion-suave: #dcf1ed;    /* reacciones */
+  --cortante: #3a7cc0; --cortante-suave: #d9e9f8;    /* cortante */
+  --momento: #5b9a4f; --momento-suave: #dff0d9;      /* momento */
+  --normal: #b07a1e; --normal-suave: #f8ecd5;        /* fuerza normal */
+  --foco: #7c5cc4; --foco-suave: #ece6f8;            /* lectura, brazo de palanca, resultante */
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+body { background: var(--papel); color: var(--tinta); font: 16px/1.5 var(--f-texto); }
+.pagina { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.materia { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); font-weight: 700; }
+h1 { font-size: clamp(24px, 3.2vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.indicacion { margin: 0; color: var(--tinta-2); max-width: 75ch; }
+.controles { background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px; padding: 14px 16px;
+  display: grid; gap: 14px 24px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.control { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.control.ancho { grid-column: 1 / -1; }
+.control-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.control label, .control .rotulo { font-weight: 700; font-size: 15px; }
+.sim { font-style: italic; font-weight: 400; color: var(--tinta-2); }
+.valor { display: inline-flex; align-items: baseline; gap: 4px; }
+.valor input { width: 6.2em; font: 500 15px var(--f-num); text-align: right; color: var(--tinta); border: 1px solid var(--borde);
+  border-radius: 6px; padding: 3px 6px; background: var(--papel); font-variant-numeric: tabular-nums; }
+.valor span { font-size: 14px; color: var(--tinta-2); }
+input[type="range"] { width: 100%; accent-color: var(--tinta); height: 26px; }
+input[type="range"].carga { accent-color: var(--carga); }
+input:focus-visible, button:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.segmento { display: flex; flex-wrap: wrap; border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: var(--papel); }
+.segmento button { flex: 1 1 auto; font: 600 15px var(--f-texto); color: var(--tinta-2); background: transparent; border: 0;
+  border-left: 1px solid var(--borde); padding: 7px 10px; cursor: pointer; min-height: 38px; }
+.segmento button:first-child { border-left: 0; }
+.segmento button[aria-pressed="true"] { background: var(--tinta); color: #fff; }
+.opciones { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; font-size: 15px; color: var(--tinta-2); }
+.opciones label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.cuerpo { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+.tarjeta { background: var(--hoja); border: 1px solid var(--borde); border-radius: 10px; padding: 12px 14px 10px; min-width: 0; }
+.tarjeta h2 { font-size: 15px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tarjeta h2 .muestra { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.figuras { display: grid; gap: 10px; min-width: 0; }
+svg.dibujo { width: 100%; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+svg text { font-family: var(--f-texto); fill: var(--tinta); }
+svg .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--tinta-2); margin: 4px 2px 2px; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 18px; height: 5px; border-radius: 3px; display: inline-block; }
+.lectura { font: 14px var(--f-num); color: var(--tinta-2); min-height: 1.5em; margin: 4px 2px 2px; font-variant-numeric: tabular-nums; }
+.lectura b { color: var(--tinta); font-weight: 500; }
+.veredicto { border-radius: 10px; padding: 10px 14px; font-size: 16px; border: 1.5px solid; }
+.veredicto b { font-size: 18px; }
+.veredicto.iso { background: var(--reaccion-suave); border-color: var(--reaccion); }
+.veredicto.hiper { background: #fff6e5; border-color: #c77700; }
+.veredicto.inest { background: var(--carga-suave); border-color: var(--carga); }
+.tabla-envoltura { overflow-x: auto; }
+table.datos { width: 100%; border-collapse: collapse; font-size: 14.5px; white-space: nowrap; }
+.datos th { font-size: 12px; letter-spacing: .04em; color: var(--tinta-2); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--borde); text-align: right; }
+.datos th:first-child, .datos td:first-child { text-align: left; }
+.datos td { padding: 5px 8px; border-bottom: 1px solid var(--reticula); font-family: var(--f-num); text-align: right; font-variant-numeric: tabular-nums; }
+.datos td:first-child { font-family: var(--f-texto); }
+.datos tr.total td { font-weight: 700; border-top: 2px solid var(--borde); background: var(--papel); }
+.pasos { display: grid; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .pasos { position: static; } }
+.pasos > div { min-width: 0; display: grid; gap: 4px; }
+.paso { padding: 8px 0 10px; border-top: 1px solid var(--reticula); min-width: 0; }
+.paso:first-of-type { border-top: 0; }
+.paso h3 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); margin: 0 0 4px; }
+.paso p { margin: 2px 0 4px; font-size: 15px; }
+.ec { overflow-x: auto; overflow-y: hidden; padding: 2px 0; display: grid; gap: 2px; justify-items: start; min-width: 0; }
+.ec .linea { font-size: 17px; line-height: 1; padding: 3px 2px; }
+.ec .linea mjx-container { margin: 0 !important; position: relative; }
+mjx-assistive-mml { position: absolute !important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0 !important; border: 0 !important; height: 1px !important; width: 1px !important; overflow: hidden !important; display: block !important; user-select: none; }
+.ec .linea mjx-container svg { max-width: none; }
+.ec .linea.fin { background: var(--reaccion-suave); border-radius: 6px; padding: 4px 8px; }
+.ec .linea.fin.m { background: var(--momento-suave); }
+.ec .linea.fin.v { background: var(--cortante-suave); }
+.ec .linea.fin.c { background: var(--carga-suave); }
+.ec .linea.fin.f { background: var(--foco-suave); }
+.ec .sep { height: 6px; }
+.nota { font-size: 13px; color: var(--tinta-2); margin: 0; }
+@media (max-width: 520px) { .ec .linea { font-size: 15px; } }
+
+</style>
+
+<nav style="max-width:980px;margin:0 auto;padding:14px 16px 0;font-family:Lexend,Arial,sans-serif;font-size:15px;display:flex;gap:16px;flex-wrap:wrap"><a href="ei-1-4.html" style="color:#1f4fd1;font-weight:600;text-decoration:none">← Volver al tema EI-1.4</a><a href="interactivos.html" style="color:#44546a;text-decoration:none">Todos los interactivos</a><a href="index.html" style="color:#44546a;text-decoration:none">Aula Centroide</a></nav>
+<div class="pagina">
+  <header>
+    <span class="materia">Estructuras isostáticas · Cargas distribuidas</span>
+    <h1>Resultante de una carga distribuida</h1>
+    <p class="indicacion">Ajusta la intensidad al inicio y al final: la carga puede ser uniforme, triangular o trapecial. Arrastra el bloque o sus extremos. La carga se divide en un rectángulo y un triángulo; su resultante pasa por el centroide del área de carga.</p>
+  </header>
+
+  <section class="controles" aria-label="Datos de la carga">
+    <div class="control"><div class="control-fila"><label for="L">Claro de la viga <span class="sim">L</span></label>
+      <span class="valor"><input id="L-num" type="number" min="2" max="12" step="0.5" aria-label="Claro en metros"><span>m</span></span></div>
+      <input id="L" type="range" min="2" max="12" step="0.5"></div>
+    <div class="control"><div class="control-fila"><label for="w1">Intensidad al inicio <span class="sim">w<sub>1</sub></span></label>
+      <span class="valor"><input id="w1-num" type="number" min="0" max="3000" step="50" aria-label="Intensidad inicial en kgf/m"><span>kgf/m</span></span></div>
+      <input id="w1" class="carga" type="range" min="0" max="3000" step="50"></div>
+    <div class="control"><div class="control-fila"><label for="w2">Intensidad al final <span class="sim">w<sub>2</sub></span></label>
+      <span class="valor"><input id="w2-num" type="number" min="0" max="3000" step="50" aria-label="Intensidad final en kgf/m"><span>kgf/m</span></span></div>
+      <input id="w2" class="carga" type="range" min="0" max="3000" step="50"></div>
+    <div class="control"><div class="control-fila"><label for="x1">Inicio de la carga <span class="sim">x<sub>1</sub></span></label>
+      <span class="valor"><input id="x1-num" type="number" min="0" max="12" step="0.05" aria-label="Inicio en metros"><span>m</span></span></div>
+      <input id="x1" class="carga" type="range" min="0" max="12" step="0.05"></div>
+    <div class="control"><div class="control-fila"><label for="x2">Final de la carga <span class="sim">x<sub>2</sub></span></label>
+      <span class="valor"><input id="x2-num" type="number" min="0" max="12" step="0.05" aria-label="Final en metros"><span>m</span></span></div>
+      <input id="x2" class="carga" type="range" min="0" max="12" step="0.05"></div>
+    <div class="opciones">
+      <label><input type="checkbox" id="o-partes" checked> Mostrar el rectángulo y el triángulo con sus resultantes</label>
+      <label><input type="checkbox" id="o-R" checked> Mostrar reacciones (viga simplemente apoyada)</label>
+    </div>
+  </section>
+
+  <div class="cuerpo">
+    <section class="figuras" aria-label="Carga y resultante">
+      <div class="tarjeta">
+        <h2>Carga distribuida y su resultante</h2>
+        <svg class="dibujo" id="svg" viewBox="0 0 800 330" role="img" aria-label="Viga con carga distribuida y su resultante"></svg>
+        <div class="leyenda">
+          <span><i style="background:var(--carga)"></i>Carga</span>
+          <span><i style="background:#c97b84"></i>Parte rectangular y triangular</span>
+          <span><i style="background:var(--foco)"></i>Resultante <em>W</em></span>
+          <span><i style="background:var(--reaccion)"></i>Reacciones</span>
+        </div>
+      </div>
+      <div class="tarjeta">
+        <h2>Tabla de resultantes</h2>
+        <div class="tabla-envoltura"><table class="datos" id="tabla"></table></div>
+        <p class="nota" style="margin-top:6px">La posición <i>x̄</i> se mide desde el apoyo A. La resultante de la carga completa es la suma de las partes y su posición, el promedio ponderado.</p>
+      </div>
+    </section>
+    <aside class="tarjeta pasos" aria-label="Cálculo paso a paso">
+      <div class="paso"><h3>Datos</h3><div class="ec" id="e-datos"></div></div>
+      <div class="paso"><h3>1 · Resultante de cada parte</h3><p id="t-partes"></p><div class="ec" id="e-partes"></div></div>
+      <div class="paso"><h3>2 · Resultante total y su posición</h3><div class="ec" id="e-W"></div></div>
+      <div class="paso" id="p-R"><h3>3 · Reacciones</h3><p>La viga se resuelve con la resultante, como si fuera una carga puntual:</p><div class="ec" id="e-R"></div></div>
+      <div class="paso"><p class="nota">La resultante sirve para calcular reacciones; para cortantes y momentos dentro del tramo cargado se usa la carga real (unidad 2).</p></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ---------------- utilidades comunes ----------------
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmt = (v, d = 0) => {
+    const s = Math.abs(v) < 0.5 * 10 ** -d ? 0 : v;
+    return s.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/,/g, "\u202F").replace("-", "\u2212");
+  };
+  const rd = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
+  const dAuto = (v) => (Math.abs(v - Math.round(v)) < 0.05 ? 0 : 1);
+  const tex = (v, d = 0) => fmt(v, d).replace(/\u202F/g, "\\,").replace("\u2212", "-");
+  const texA = (v) => tex(v, dAuto(v));
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const colores = () => ({ tinta: css("--tinta"), t2: css("--tinta-2"), ret: css("--reticula"), carga: css("--carga"), cargaS: css("--carga-suave"),
+    reac: css("--reaccion"), reacS: css("--reaccion-suave"), V: css("--cortante"), VS: css("--cortante-suave"), M: css("--momento"), MS: css("--momento-suave"),
+    N: css("--normal"), NS: css("--normal-suave"), foco: css("--foco"), focoS: css("--foco-suave") });
+  const el = (tag, attrs = {}, padre) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [a, v] of Object.entries(attrs)) n.setAttribute(a, v);
+    if (padre) padre.appendChild(n);
+    return n;
+  };
+  const texto = (padre, x, y, t, attrs = {}) => { const n = el("text", { x, y, ...attrs }, padre); n.textContent = t; return n; };
+  function flecha(padre, x1, y1, x2, y2, color, ancho = 3, punta = 12, extra = {}) {
+    const ang = Math.atan2(y2 - y1, x2 - x1), w = punta * 0.58;
+    el("line", { x1, y1, x2: x2 - (punta - 2) * Math.cos(ang), y2: y2 - (punta - 2) * Math.sin(ang), stroke: color, "stroke-width": ancho, "stroke-linecap": "round", ...extra }, padre);
+    const p = [[x2, y2], [x2 - punta * Math.cos(ang) + w * Math.sin(ang), y2 - punta * Math.sin(ang) - w * Math.cos(ang)],
+               [x2 - punta * Math.cos(ang) - w * Math.sin(ang), y2 - punta * Math.sin(ang) + w * Math.cos(ang)]];
+    el("polygon", { points: p.map((q) => q.join(",")).join(" "), fill: color }, padre);
+  }
+  // flecha curva (momento): arco de radio r alrededor de (cx, cy); antihorario si ccw
+  function arcoMomento(padre, cx, cy, r, ccw, color, ancho = 2.6) {
+    const a0 = ccw ? -0.35 : Math.PI + 0.35, a1 = ccw ? Math.PI * 1.15 : -0.15 * Math.PI;   // ángulos en pantalla
+    const p = (a) => [cx + r * Math.cos(a), cy - r * Math.sin(a)];
+    const [x0, y0] = p(a0), [x1, y1] = p(a1);
+    el("path", { d: `M${x0},${y0} A${r},${r} 0 1 ${ccw ? 0 : 1} ${x1},${y1}`, fill: "none", stroke: color, "stroke-width": ancho, "stroke-linecap": "round" }, padre);
+    const tang = ccw ? a1 + Math.PI / 2 : a1 - Math.PI / 2, t = 11, w = 6.5;
+    const ux = Math.cos(tang), uy = -Math.sin(tang);
+    el("polygon", { points: `${x1 + ux * 6},${y1 + uy * 6} ${x1 - ux * t + uy * w},${y1 - uy * t - ux * w} ${x1 - ux * t - uy * w},${y1 - uy * t + ux * w}`, fill: color }, padre);
+  }
+  function etiqueta(padre, x, y, html, color, { ancla = "middle", tam = 14, relleno = "#fff", grosor = 1.3, giro = 0 } = {}) {
+    const g = el("g", giro ? { transform: `rotate(${giro} ${x} ${y})` } : {}, padre);
+    const t = el("text", { x, y, "text-anchor": ancla, "dominant-baseline": "central", "font-size": tam, "font-weight": 700, fill: color }, g);
+    t.innerHTML = html;
+    const b = t.getBBox();
+    g.insertBefore(el("rect", { x: b.x - 7, y: b.y - 3, width: b.width + 14, height: b.height + 6, rx: (b.height + 6) / 2, fill: relleno, stroke: color, "stroke-width": grosor }), t);
+    // que no se salga del lienzo por los lados
+    const svg = g.ownerSVGElement, vb = svg && svg.viewBox.baseVal;
+    if (!giro && vb && vb.width) {
+      const izq = b.x - 9, der = b.x + b.width + 9;
+      if (izq < 2) g.setAttribute("transform", `translate(${2 - izq} 0)`);
+      else if (der > vb.width - 2) g.setAttribute("transform", `translate(${vb.width - 2 - der} 0)`);
+    }
+    return g;
+  }
+  function definiciones(svg, C) {
+    el("defs", {}, svg).innerHTML = `
+      <linearGradient id="g-viga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbe4ee"/><stop offset=".45" stop-color="#b9c9da"/><stop offset="1" stop-color="#8ea4bc"/></linearGradient>
+      <linearGradient id="g-col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#dbe4ee"/><stop offset=".45" stop-color="#b9c9da"/><stop offset="1" stop-color="#8ea4bc"/></linearGradient>
+      <linearGradient id="g-apoyo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe6ef"/></linearGradient>
+      <linearGradient id="g-terreno" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe7da"/><stop offset="1" stop-color="#f8f4ee" stop-opacity="0"/></linearGradient>
+      <linearGradient id="g-muro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f8f4ee" stop-opacity="0"/><stop offset="1" stop-color="#efe7da"/></linearGradient>
+      <linearGradient id="g-muro-d" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#f8f4ee" stop-opacity="0"/><stop offset="1" stop-color="#efe7da"/></linearGradient>
+      <radialGradient id="g-nodo" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d5dee9"/></radialGradient>
+      <pattern id="p-achurado" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#b7a68c" stroke-width="1.2"/></pattern>
+      <filter id="f-sombra" x="-5%" y="-40%" width="110%" height="200%"><feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#1f2a37" flood-opacity=".18"/></filter>`;
+  }
+  function terreno(svg, xc, y, ancho, C) {
+    el("rect", { x: xc - ancho / 2, y, width: ancho, height: 14, fill: "url(#g-terreno)" }, svg);
+    el("rect", { x: xc - ancho / 2, y, width: ancho, height: 9, fill: "url(#p-achurado)" }, svg);
+    el("line", { x1: xc - ancho / 2, y1: y, x2: xc + ancho / 2, y2: y, stroke: C.tinta, "stroke-width": 1.6, "stroke-linecap": "round" }, svg);
+  }
+  // apoyos de libro de texto bajo el punto (x, y): devuelve el nivel del terreno
+  function articulado(svg, x, y, C, h = 24) {
+    terreno(svg, x, y + h, 58, C);
+    el("polygon", { points: `${x},${y} ${x - 15},${y + h} ${x + 15},${y + h}`, fill: "url(#g-apoyo)", stroke: C.tinta, "stroke-width": 1.4, "stroke-linejoin": "round" }, svg);
+    el("circle", { cx: x, cy: y, r: 4.2, fill: "#fff", stroke: C.tinta, "stroke-width": 1.4 }, svg);
+    return y + h;
+  }
+  function rodillo(svg, x, y, C, h = 24) {
+    terreno(svg, x, y + h, 58, C);
+    el("polygon", { points: `${x},${y} ${x - 15},${y + h - 9} ${x + 15},${y + h - 9}`, fill: "url(#g-apoyo)", stroke: C.tinta, "stroke-width": 1.4, "stroke-linejoin": "round" }, svg);
+    for (const dx of [-8, 0, 8]) el("circle", { cx: x + dx, cy: y + h - 4.5, r: 4, fill: "#fff", stroke: C.tinta, "stroke-width": 1.2 }, svg);
+    el("circle", { cx: x, cy: y, r: 4.2, fill: "#fff", stroke: C.tinta, "stroke-width": 1.4 }, svg);
+    return y + h;
+  }
+  // empotramiento en un muro vertical; lado = -1 (muro a la izquierda) o 1 (a la derecha)
+  function empotramiento(svg, x, yc, alto, lado, C) {
+    const x0 = lado < 0 ? x - 18 : x;
+    el("rect", { x: x0, y: yc - alto / 2, width: 18, height: alto, fill: `url(#${lado < 0 ? "g-muro" : "g-muro-d"})` }, svg);
+    el("rect", { x: x0, y: yc - alto / 2, width: 18, height: alto, fill: "url(#p-achurado)" }, svg);
+    el("line", { x1: x, y1: yc - alto / 2, x2: x, y2: yc + alto / 2, stroke: C.tinta, "stroke-width": 2, "stroke-linecap": "round" }, svg);
+  }
+  function insignia(svg, x, y, letra, C, r = 12) {
+    el("circle", { cx: x, cy: y, r, fill: "#fff", stroke: C.tinta, "stroke-width": 1.3 }, svg);
+    texto(svg, x, y + 5, letra, { "text-anchor": "middle", "font-size": 14, "font-weight": 700, "font-style": "italic" });
+  }
+  function cotaH(svg, x1, x2, y, html, C, tam = 13) {
+    if (x2 - x1 < 2) return;
+    const p = (x, d) => `${x},${y} ${x + d * 8},${y - 3.5} ${x + d * 8},${y + 3.5}`;
+    el("line", { x1, y1: y, x2, y2: y, stroke: C.t2, "stroke-width": 1 }, svg);
+    if (x2 - x1 > 20) { el("polygon", { points: p(x1, 1), fill: C.t2 }, svg); el("polygon", { points: p(x2, -1), fill: C.t2 }, svg); }
+    if (x2 - x1 > 60) etiqueta(svg, (x1 + x2) / 2, y, html, C.t2, { tam });
+  }
+  function rellenoOrdenadas(svg, id, color, suave, vertical = true) {
+    el("defs", {}, svg).innerHTML = `<pattern id="${id}" width="9" height="9" patternUnits="userSpaceOnUse"${vertical ? "" : ' patternTransform="rotate(90)"'}>
+      <rect width="9" height="9" fill="${suave}"/><line x1="4.5" y1="0" x2="4.5" y2="9" stroke="${color}" stroke-width="1" opacity=".35"/></pattern>`;
+    return `url(#${id})`;
+  }
+  // ---------------- fórmulas (MathJax en SVG, una línea por fórmula) ----------------
+  const cacheTex = new Map();
+  function aSvg(latex) { let n = cacheTex.get(latex); if (!n) { n = MathJax.tex2svg(latex, { display: false }); cacheTex.set(latex, n); if (cacheTex.size > 900) cacheTex.clear(); } return n.cloneNode(true); }
+  function poner(id, lineas) {
+    const nodo = $(id), clave = JSON.stringify(lineas);
+    if (nodo.dataset.tex === clave) return;
+    if (!window.MathJax || !MathJax.tex2svg) return;
+    nodo.dataset.tex = clave;
+    nodo.replaceChildren(...lineas.map((l) => {
+      if (l === "") { const d = document.createElement("div"); d.className = "sep"; return d; }
+      const [latex, clase] = Array.isArray(l) ? l : [l, ""];
+      const d = document.createElement("div"); d.className = "linea " + clase; d.appendChild(aSvg(latex)); return d;
+    }));
+  }
+  function alCargarMathJax(fn) {
+    if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => {
+      if (MathJax.svgStylesheet) document.head.appendChild(MathJax.svgStylesheet());
+      document.querySelectorAll(".ec").forEach((n) => delete n.dataset.tex);
+      fn();
+    });
+  }
+  // controles: deslizador + casilla numérica sincronizados; segmentos de opciones
+  function control(id, fijar) {
+    $(id).addEventListener("input", (e) => fijar(id, e.target.value));
+    $(id + "-num").addEventListener("change", (e) => fijar(id, e.target.value));
+  }
+  function segmento(id, fijar) { $(id).addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) fijar(id, b.dataset.v); }); }
+  function marcarSegmento(id, valor) { $(id).querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === String(valor)))); }
+  function arrastre(ev, nodo, al) {
+    ev.stopPropagation(); ev.preventDefault(); nodo.setPointerCapture(ev.pointerId);
+    const mover = (e) => al(e);
+    const soltar = () => nodo.removeEventListener("pointermove", mover);
+    nodo.addEventListener("pointermove", mover);
+    nodo.addEventListener("pointerup", soltar, { once: true });
+    nodo.addEventListener("pointercancel", soltar, { once: true });
+  }
+  const kgf = "\\ \\text{kgf}", m_ = "\\ \\text{m}", kgfm = "\\ \\text{kgf}\\cdot\\text{m}", kgfpm = "\\ \\text{kgf/m}";
+
+  const estado = { L: 6, w1: 400, w2: 1000, x1: 0, x2: 6, partes: true, R: true };
+  function resolver(e) {
+    const l = e.x2 - e.x1, wm = Math.min(e.w1, e.w2), dw = Math.abs(e.w2 - e.w1), crece = e.w2 >= e.w1;
+    const Wr = wm * l, xr = e.x1 + l / 2;
+    const Wt = dw * l / 2, xt = crece ? e.x1 + 2 * l / 3 : e.x1 + l / 3;
+    const W = Wr + Wt, xb = W > 0 ? (Wr * xr + Wt * xt) / W : e.x1 + l / 2;
+    const RB = W * xb / e.L, RA = W - RB;
+    return { ...e, l, wm, dw, crece, Wr, xr, Wt, xt, W, xb, RA, RB, tipo: dw < 1e-9 ? "uniforme" : wm < 1e-9 ? "triangular" : "trapecial" };
+  }
+  let W_ = 800, X0 = 80, X1 = 720;
+  function medir() {
+    const ancho = $("svg").getBoundingClientRect().width || 800;
+    W_ = ancho < 600 ? 480 : 800; X0 = W_ < 800 ? 46 : 80; X1 = W_ - X0;
+    $("svg").setAttribute("viewBox", `0 0 ${W_} ${W_ < 800 ? 320 : 330}`);
+  }
+  const sx = (x) => X0 + (x / estado.L) * (X1 - X0);
+  function dibujar(s) {
+    const svg = $("svg"); svg.textContent = ""; const C = colores(), chico = W_ < 800; definiciones(svg, C);
+    const yv = 190, hv = 16, ys = yv + hv / 2, ytop = yv - hv / 2 - 2, hmax = 100, esc = hmax / Math.max(1500, s.w1, s.w2);
+    articulado(svg, X0, ys + 2, C); rodillo(svg, X1, ys + 2, C);
+    const gv = el("g", { filter: "url(#f-sombra)" }, svg);
+    el("rect", { x: X0 - 8, y: yv - hv / 2, width: X1 - X0 + 16, height: hv, rx: 2.5, fill: "url(#g-viga)", stroke: C.tinta, "stroke-width": 1.2 }, gv);
+    insignia(svg, X0 - 30, yv, "A", C); insignia(svg, X1 + 30, yv, "B", C);
+    const a = sx(s.x1), b = sx(s.x2), h1 = s.w1 * esc, h2 = s.w2 * esc;
+    // bloque de carga
+    const g = el("g", { style: "cursor:grab" }, svg);
+    el("polygon", { points: `${a},${ytop} ${a},${ytop - h1} ${b},${ytop - h2} ${b},${ytop}`, fill: C.cargaS }, g);
+    if (s.partes && s.dw > 0 && s.wm > 0) el("line", { x1: a, y1: ytop - s.wm * esc, x2: b, y2: ytop - s.wm * esc, stroke: "#c97b84", "stroke-width": 1.4, "stroke-dasharray": "5 4" }, svg);
+    el("line", { x1: a, y1: ytop - h1, x2: b, y2: ytop - h2, stroke: C.carga, "stroke-width": 2.8 }, g);
+    const n = Math.max(1, Math.round((b - a) / 24));
+    for (let i = 0; i <= n; i++) { const x = a + (i / n) * (b - a), h = h1 + (i / n) * (h2 - h1); if (h > 9) flecha(g, x, ytop - h, x, ytop, C.carga, 1.4, 7); }
+    g.addEventListener("pointerdown", (ev) => { const r0 = svg.getBoundingClientRect(), x0 = ev.clientX, a0 = s.x1, l = s.l;
+      arrastre(ev, g, (e) => { const dx = ((e.clientX - x0) / r0.width) * W_ / (X1 - X0) * estado.L; let n1 = Math.round((a0 + dx) / 0.05) * 0.05; n1 = Math.min(estado.L - l, Math.max(0, n1)); estado.x1 = n1; estado.x2 = n1 + l; sincronizar(); actualizar(); }); });
+    for (const [x, clave, h] of [[a, "x1", h1], [b, "x2", h2]]) {
+      const gh = el("g", { style: "cursor:ew-resize" }, svg);
+      el("rect", { x: x - 16, y: ytop - Math.max(h, 20) - 16, width: 32, height: Math.max(h, 20) + 18, fill: "transparent" }, gh);
+      el("circle", { cx: x, cy: ytop - h, r: 7.5, fill: "#fff", stroke: C.carga, "stroke-width": 2 }, gh);
+      gh.addEventListener("pointerdown", (ev) => arrastre(ev, gh, (e) => { const r = svg.getBoundingClientRect(); fijar(clave, Math.round(((((e.clientX - r.left) / r.width) * W_ - X0) / (X1 - X0) * estado.L) / 0.05) * 0.05); }));
+    }
+    etiqueta(svg, a - 10, ytop - h1 - 4, `<tspan font-style="italic">w</tspan><tspan font-size="10" dy="4">1</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(s.w1)}</tspan>`, C.carga, { ancla: "end", relleno: C.cargaS, tam: chico ? 11.5 : 13 });
+    etiqueta(svg, b + 10, ytop - h2 - 4, `<tspan font-style="italic">w</tspan><tspan font-size="10" dy="4">2</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(s.w2)}</tspan>`, C.carga, { ancla: "start", relleno: C.cargaS, tam: chico ? 11.5 : 13 });
+    // resultantes de las partes
+    if (s.partes && s.dw > 0 && s.wm > 0) for (const [x, nom, val] of [[s.xr, "1", s.Wr], [s.xt, "2", s.Wt]]) {
+      const px = sx(x); flecha(svg, px, 26, px, ytop - 2, "#c97b84", 2, 9, { "stroke-dasharray": "6 4" });
+      const otro = sx(nom === "1" ? s.xt : s.xr), esIzq = px < otro, cerca = Math.abs(px - otro) < 120;
+      etiqueta(svg, cerca ? px + (esIzq ? 22 : -22) : px, 22, `<tspan font-style="italic">W</tspan><tspan font-size="10" dy="4">${nom}</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(val)}</tspan>`, "#a35560", { tam: chico ? 11 : 12, ancla: cerca ? (esIzq ? "end" : "start") : "middle" });
+    }
+    // resultante total
+    if (s.W > 0) {
+      const px = sx(s.xb), yt = s.partes && s.dw > 0 && s.wm > 0 ? 50 : 30;
+      flecha(svg, px, yt + 12, px, ytop - 2, C.foco, 3.4, 13, { "stroke-dasharray": "9 5" });
+      etiqueta(svg, px, yt, `<tspan font-style="italic">W</tspan> = <tspan class="num">${fmt(s.W)}</tspan> kgf`, C.foco, { relleno: C.focoS, tam: chico ? 12.5 : 14 });
+    }
+    // reacciones
+    if (s.R) {
+      const yT = ys + 2 + 24 + 16;
+      for (const [x, R, sub, i] of [[X0, s.RA, "A", 0], [X1, s.RB, "B", 1]]) {
+        if (R > 0.5) flecha(svg, x, yT + 34, x, yT, C.reac, 3.2);
+        etiqueta(svg, x + (i ? -12 : 12), yT + 30, `<tspan font-style="italic">R</tspan><tspan font-size="10" dy="4">${sub}</tspan><tspan dy="-4"> = </tspan><tspan class="num">${fmt(R, 1)}</tspan>`, C.reac, { ancla: i ? "end" : "start", tam: chico ? 12 : 13.5 });
+      }
+    }
+    // cotas: x1, ℓ y x̄
+    const yc1 = chico ? 290 : 296, yc2 = yc1 + 22;
+    svg.setAttribute("viewBox", `0 0 ${W_} ${yc2 + 14}`);
+    for (const x of [a, b]) el("line", { x1: x, y1: ytop + 2, x2: x, y2: yc1 + 6, stroke: C.t2, "stroke-width": .7, "stroke-dasharray": "3 3" }, svg);
+    cotaH(svg, X0, a, yc1, `<tspan font-style="italic">x</tspan><tspan font-size="9" dy="3">1</tspan>`, C, 12);
+    cotaH(svg, a, b, yc1, `<tspan font-style="italic">ℓ</tspan> = <tspan class="num">${fmt(s.l, 2)}</tspan> m`, C, chico ? 12 : 13);
+    if (s.W > 0) {
+      const px = sx(s.xb); el("line", { x1: px, y1: ytop + 2, x2: px, y2: yc2 + 6, stroke: C.foco, "stroke-width": .8, "stroke-dasharray": "3 3" }, svg);
+      el("line", { x1: X0, y1: yc1 + 6, x2: X0, y2: yc2 + 6, stroke: C.t2, "stroke-width": .7 }, svg);
+      const g2 = el("g", {}, svg); cotaH(g2, X0, px, yc2, `<tspan font-style="italic">x̄</tspan> = <tspan class="num">${fmt(s.xb, 3)}</tspan> m`, { t2: C.foco }, chico ? 12 : 13);
+    }
+  }
+  function tabla(s) {
+    let h = `<thead><tr><th>Parte</th><th>Área de carga</th><th>W (kgf)</th><th>x̄ (m)</th><th>W·x̄ (kgf·m)</th></tr></thead><tbody>`;
+    const filas = [];
+    if (s.wm > 0) filas.push(["Rectángulo", `(${fmt(s.wm)})(${fmt(s.l, 2)})`, s.Wr, s.xr]);
+    if (s.dw > 0) filas.push(["Triángulo", `(${fmt(s.dw)})(${fmt(s.l, 2)})/2`, s.Wt, s.xt]);
+    for (const [n, area, Wv, x] of filas) h += `<tr><td><b>${n}</b></td><td>${area}</td><td>${fmt(Wv, 1)}</td><td>${fmt(x, 3)}</td><td>${fmt(Wv * x, 1)}</td></tr>`;
+    h += `<tr class="total"><td>Total</td><td></td><td>${fmt(s.W, 1)}</td><td>${fmt(s.xb, 3)}</td><td>${fmt(s.W * s.xb, 1)}</td></tr>`;
+    $("tabla").innerHTML = h + "</tbody>";
+  }
+  function escribir(s) {
+    const L = tex(s.L, 2), x1 = tex(s.x1, 2), x2 = tex(s.x2, 2), l = tex(s.l, 2);
+    poner("e-datos", [`L = ${L}${m_}`, `w_1 = ${tex(s.w1)}${kgfpm} \\qquad w_2 = ${tex(s.w2)}${kgfpm}`, `x_1 = ${x1}${m_} \\qquad x_2 = ${x2}${m_}`, `\\ell = x_2 - x_1 = ${l}${m_}`]);
+    $("t-partes").innerHTML = { uniforme: "Carga <b>uniforme</b>: un solo rectángulo; su resultante está al centro del tramo.", triangular: "Carga <b>triangular</b>: su resultante está a un tercio del lado más alto (a 2ℓ/3 del vértice).", trapecial: "Carga <b>trapecial</b>: rectángulo de altura igual a la menor intensidad, más un triángulo con la diferencia." }[s.tipo];
+    const lin = [];
+    const Wr = rd(s.Wr, 1), Wt = rd(s.Wt, 1), xr = rd(s.xr, 3), xt = rd(s.xt, 3);
+    if (s.wm > 0) lin.push(`W_1 = w_{\\text{mín}}\\,\\ell = (${tex(s.wm)})(${l}) = ${tex(Wr, dAuto(Wr))}${kgf}`, `\\bar{x}_1 = x_1 + \\dfrac{\\ell}{2} = ${tex(xr, 3)}${m_}`);
+    if (s.wm > 0 && s.dw > 0) lin.push("");
+    if (s.dw > 0) lin.push(`W_2 = \\dfrac{(${tex(s.dw)})(${l})}{2} = ${tex(Wt, dAuto(Wt))}${kgf}`, `\\bar{x}_2 = x_1 + \\dfrac{${s.crece ? "2" : ""}\\ell}{3} = ${tex(xt, 3)}${m_}`);
+    if (!lin.length) lin.push(`\\text{Sin carga.}`);
+    poner("e-partes", lin);
+    const W = rd(Wr + Wt, 1), Mx = rd(Wr * xr + Wt * xt, 1), xb = W > 0 ? rd(Mx / W, 3) : 0;
+    poner("e-W", s.W > 0 ? [
+      `W = \\textstyle\\sum W_i = ${s.wm > 0 && s.dw > 0 ? `${tex(Wr, dAuto(Wr))} + ${tex(Wt, dAuto(Wt))}` : tex(W, dAuto(W))}`, [`W = ${tex(W, dAuto(W))}${kgf}`, "fin f"],
+      `\\textstyle\\sum W_i\\,\\bar{x}_i = ${s.wm > 0 && s.dw > 0 ? `(${tex(Wr, dAuto(Wr))})(${tex(xr, 3)}) + (${tex(Wt, dAuto(Wt))})(${tex(xt, 3)})` : `(${tex(W, dAuto(W))})(${tex(s.wm > 0 ? xr : xt, 3)})`}`,
+      `\\bar{x} = \\dfrac{\\sum W_i\\,\\bar{x}_i}{W} = \\dfrac{${tex(Mx, 1)}}{${tex(W, dAuto(W))}}`, [`\\bar{x} = ${tex(xb, 3)}${m_} \\ \\text{desde A}`, "fin f"],
+    ] : [`W = 0`]);
+    $("p-R").hidden = !s.R;
+    if (s.R) { const RB = rd(Mx / s.L, 1), RA = rd(W - RB, 1);
+      poner("e-R", [`\\textstyle\\sum M_A = 0: \\ R_B\\,L - W\\,\\bar{x} = 0`, `R_B = \\dfrac{W\\,\\bar{x}}{L} = \\dfrac{${tex(Mx, 1)}}{${L}}`, [`R_B = ${tex(RB, 1)}${kgf}`, "fin"], `R_A = W - R_B = ${tex(W, dAuto(W))} - ${tex(RB, 1)}`, [`R_A = ${tex(RA, 1)}${kgf}`, "fin"]]); }
+  }
+  let pendiente = false;
+  function actualizar() { if (pendiente) return; pendiente = true; requestAnimationFrame(() => { pendiente = false; const s = resolver(estado); dibujar(s); tabla(s); escribir(s); }); }
+  function fijar(clave, v) {
+    v = Number(v); if (!Number.isFinite(v)) return;
+    if (clave === "L") { const r1 = estado.x1 / estado.L, r2 = estado.x2 / estado.L; estado.L = Math.min(12, Math.max(2, v)); estado.x1 = Math.round(r1 * estado.L / 0.05) * 0.05; estado.x2 = Math.round(r2 * estado.L / 0.05) * 0.05; }
+    else if (clave === "w1" || clave === "w2") estado[clave] = Math.min(3000, Math.max(0, v));
+    else if (clave === "x1") estado.x1 = Math.min(estado.x2 - 0.1, Math.max(0, v));
+    else if (clave === "x2") estado.x2 = Math.max(estado.x1 + 0.1, Math.min(estado.L, v));
+    sincronizar(); actualizar();
+  }
+  function sincronizar() {
+    $("L").value = estado.L; $("L-num").value = estado.L.toFixed(1);
+    for (const k2 of ["w1", "w2"]) { $(k2).value = estado[k2]; $(k2 + "-num").value = estado[k2]; }
+    for (const k2 of ["x1", "x2"]) { $(k2).max = estado.L; $(k2 + "-num").max = estado.L; $(k2).value = estado[k2]; $(k2 + "-num").value = estado[k2].toFixed(2); }
+    $("o-partes").checked = estado.partes; $("o-R").checked = estado.R;
+  }
+  for (const k2 of ["L", "w1", "w2", "x1", "x2"]) control(k2, fijar);
+  $("o-partes").addEventListener("change", (e) => { estado.partes = e.target.checked; actualizar(); });
+  $("o-R").addEventListener("change", (e) => { estado.R = e.target.checked; actualizar(); });
+  medir(); sincronizar(); actualizar();
+  let anchoPrevio = window.innerWidth;
+  window.addEventListener("resize", () => { if (window.innerWidth !== anchoPrevio) { anchoPrevio = window.innerWidth; medir(); actualizar(); } });
+  alCargarMathJax(actualizar);
+  window.__res = { resolver, estado, fijar };
+})();
+</script>
+
+</html>
