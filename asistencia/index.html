@@ -5,15 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Registro de asistencia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 <main class="wrap">
   <header class="top">
-    <div class="logo">✓</div>
+    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
     <div>
-      <h1>Registro de asistencia</h1>
-      <p class="sub">Aula Centroide</p>
+      <p class="marca">PASE DE <b>LISTA</b></p>
+      <h1>¡Hola! Registra tu asistencia</h1>
     </div>
   </header>
 
@@ -43,7 +46,7 @@
       <button id="btnUbic" class="link oculto">Reintentar</button>
     </div>
 
-    <button id="btnRegistrar" class="btn" disabled>Registrar asistencia</button>
+    <button id="btnRegistrar" class="btn" disabled>Registrarme</button>
   </section>
 
   <!-- Paso 3: confirmación -->
@@ -104,7 +107,7 @@ function iniciarReloj() {
     const s = Math.max(0, Math.round((vence - Date.now()) / 1000));
     $('barra').style.width = (s / total * 100) + '%';
     $('lblTiempo').textContent = s
-      ? 'Tienes ' + Math.floor(s / 60) + ':' + pad2(s % 60) + ' para registrarte'
+      ? 'Te quedan ' + Math.floor(s / 60) + ':' + pad2(s % 60) + ' para registrarte'
       : 'Tiempo agotado: vuelve a escanear el código proyectado.';
     if (!s) { clearInterval(reloj); $('btnRegistrar').disabled = true; }
   };
@@ -118,7 +121,7 @@ async function pedirUbicacion() {
   try {
     ubic = await mejorUbicacion(15000, 35);
     $('ubic').className = 'ubic ok';
-    $('ubicTxt').textContent = 'Ubicación lista (±' + Math.round(ubic.acc) + ' m)';
+    $('ubicTxt').textContent = 'Estás en el plantel · ±' + Math.round(ubic.acc) + ' m';
   } catch (e) {
     ubic = null;
     $('ubic').className = 'ubic mal';
@@ -145,7 +148,7 @@ $('btnRegistrar').onclick = async () => {
     const ret = r.estado === 'Retardo';
     $('sello').className = 'sello' + (ret ? ' ret' : '');
     $('sello').textContent = ret ? '⏱' : '✓';
-    $('lblEstado').textContent = r.yaRegistrado ? 'Ya estabas registrado' : (ret ? 'Registrado con retardo' : '¡Asistencia registrada!');
+    $('lblEstado').textContent = r.yaRegistrado ? 'Ya estabas registrado' : (ret ? 'Quedaste con retardo' : '¡Listo, ya estás registrado!');
     $('lblNombre').textContent = r.nombre;
     $('lblHora').textContent = (r.yaRegistrado ? 'Registro previo: ' : 'Hora: ') + String(r.hora).slice(0, 5) + ' · ' + r.estado;
     mostrar('pListo');
@@ -153,7 +156,7 @@ $('btnRegistrar').onclick = async () => {
     error(e.message);
     listo();
   } finally {
-    b.textContent = 'Registrar asistencia';
+    b.textContent = 'Registrarme';
   }
 };
 

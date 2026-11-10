@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Pase de lista · Docente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="estilos.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 </head>
@@ -13,8 +16,8 @@
 <!-- ================= LOGIN ================= -->
 <main id="vLogin" class="wrap">
   <header class="top">
-    <div class="logo">✓</div>
-    <div><h1>Pase de lista</h1><p class="sub">Acceso docente</p></div>
+    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><p class="marca">PANEL <b>DOCENTE</b></p><h1>Pase de lista</h1><p class="sub">Entra con tu PIN</p></div>
   </header>
   <section class="card">
     <label for="inPin" style="margin-top:0">PIN</label>
@@ -28,8 +31,8 @@
 <!-- ================= PANEL ================= -->
 <main id="vPanel" class="wrap ancho oculto">
   <header class="top">
-    <div class="logo">✓</div>
-    <div><h1>Pase de lista</h1><p class="sub">Panel docente</p></div>
+    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><p class="marca">PANEL <b>DOCENTE</b></p><h1>Pase de lista</h1></div>
   </header>
 
   <nav class="tabs">
@@ -99,9 +102,9 @@
 <!-- ================= PASE DE LISTA EN CURSO ================= -->
 <main id="vSesion" class="wrap ancho sesion oculto">
   <div class="ses-top">
-    <div>
-      <h1 id="sTitulo"></h1>
-      <p class="sub" id="sSub"></p>
+    <div class="marca-fila">
+      <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <div><h1 id="sTitulo"></h1><p class="sub" id="sSub"></p></div>
     </div>
     <div class="botones" style="margin:0">
       <button class="btn sec chico" id="btnFull">Pantalla completa</button>
@@ -112,15 +115,15 @@
 
   <div class="ses-cuerpo">
     <section class="card qrbox">
-      <img id="qr" alt="Código QR de asistencia">
-      <p class="codigo-grande" id="sCodigo">— — —</p>
-      <p class="url-alumno" id="sUrl"></p>
+      <div class="qrmarco"><img id="qr" alt="Código QR de asistencia"></div>
+      <p class="etiqueta-qr">Escanea el QR con tu celular</p>
+      <p class="codigo-grande" id="sCodigo" style="margin-bottom:12px">— — —</p>
       <div class="tiempo"><div id="sBarra"></div></div>
       <p class="mini" id="sEstado"></p>
     </section>
 
     <section class="card">
-      <p class="contador"><span id="sCuenta">0</span> <small>/ <span id="sTotal">0</span> registrados</small></p>
+      <p class="contador"><span id="sCuenta">0</span> <small>de <span id="sTotal">0</span> ya están</small></p>
       <p class="mini" id="sDetalle"></p>
       <ul class="lista" id="sLista"></ul>
       <p class="mini" id="sRechazos"></p>
@@ -190,7 +193,7 @@ function pintarPanel() {
   $('abiertas').innerHTML = DATOS.abiertas.length
     ? '<h2>Pases de lista abiertos</h2>' + DATOS.abiertas.map(s =>
         '<div class="abierta"><div><strong>' + esc(s.grupo) + '</strong><br><span class="mini">' + esc(s.materia) + ' · ' + s.fecha + ' ' + s.inicio +
-        '</span></div><button class="btn chico" data-id="' + s.id + '">Reanudar</button></div>').join('') + '<hr style="border:0;border-top:1px solid var(--borde);margin:16px 0">'
+        '</span></div><button class="btn chico" data-id="' + s.id + '">Reanudar</button></div>').join('') + '<hr class="separador">'
     : '';
   $('abiertas').querySelectorAll('button[data-id]').forEach(b => b.onclick = () => abrirVista(DATOS.abiertas.find(s => s.id === b.dataset.id)));
 
@@ -232,7 +235,6 @@ async function abrirVista(s) {
   SES = s; codigoActual = ''; finVentana = 0;
   $('sTitulo').textContent = s.grupo;
   $('sSub').textContent = [s.materia, s.plantel, 'Inicio ' + s.inicio, s.referencia].filter(Boolean).join(' · ');
-  $('sUrl').textContent = URL_ALUMNO.replace(/^https?:\/\//, '');
   $('sLista').innerHTML = ''; $('sCodigo').textContent = '— — —'; $('qr').removeAttribute('src');
   vista('vSesion');
   try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
