@@ -73,11 +73,11 @@
   <!-- Reportes -->
   <section id="tReportes" class="card oculto">
     <h2>Reportes de asistencia</h2>
-    <div class="fila">
-      <div><label for="repGrupo">Grupo</label><select id="repGrupo"></select></div>
+    <label for="repGrupo">Grupo</label><select id="repGrupo"></select>
+    <div class="filtros">
       <div><label for="repDesde">Desde</label><input type="date" id="repDesde"></div>
       <div><label for="repHasta">Hasta</label><input type="date" id="repHasta"></div>
-      <div><label for="repMin">Mínimo requerido (%)</label><input type="number" id="repMin" value="80" min="0" max="100"></div>
+      <div><label for="repMin">Mínimo %</label><input type="number" id="repMin" value="80" min="0" max="100"></div>
     </div>
     <div class="rangos">
       <button class="btn sec chico" data-r="hoy">Hoy</button>
@@ -85,7 +85,7 @@
       <button class="btn sec chico" data-r="mes">Este mes</button>
       <button class="btn sec chico" data-r="todo">Todo el ciclo</button>
       <button class="btn chico" id="btnRep">Consultar</button>
-      <button class="btn sec chico oculto" id="btnCsv">Descargar Excel (CSV)</button>
+      <button class="btn chico oculto" id="btnCsv" style="background:var(--exito)">Descargar Excel</button>
     </div>
     <div id="repSalida"></div>
   </section>
@@ -317,7 +317,7 @@ async function consultar() {
   $('btnCsv').classList.add('oculto');
   try {
     REP = await llamar('reporte', { clave: $('repGrupo').value, desde: $('repDesde').value, hasta: $('repHasta').value });
-    REP.grupo = $('repGrupo').selectedOptions[0] ? $('repGrupo').selectedOptions[0].textContent : $('repGrupo').value;
+    REP.clave = $('repGrupo').value;
     pintarReporte();
   } catch (e) { $('repSalida').innerHTML = '<p class="error">' + esc(e.message) + '</p>'; }
 }
@@ -325,37 +325,176 @@ async function consultar() {
 const LETRA = { 'Asistencia': 'A', 'Retardo': 'R', 'Falta': 'F' };
 function fechaCorta(f) { const p = f.split('-'); return p[2] + '/' + p[1]; }
 
+function nombreBonito(n) {
+  return String(n || '').toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase())
+    .replace(/\b(De|Del|La|Las|Los|Y)\b/g, w => w.toLowerCase());
+}
+function claseEstado(e) { return e === 'Asistencia' ? 'A' : e === 'Retardo' ? 'R' : e === 'Falta' ? 'F' : (e ? 'O' : 'P'); }
+function pl(n, uno, varios) { return n + ' ' + (n === 1 ? uno : varios); }
+function nivel(p, min) { return p === null ? 'nd' : p < min ? 'bajo' : p < min + 10 ? 'medio' : 'bien'; }
+let VISTA = 'alumno', ORDEN = 'nombre';
+
 function pintarReporte() {
   const r = REP, min = Number($('repMin').value) || 0;
-  if (!r.sesiones.length) { $('repSalida').innerHTML = '<p class="mini" style="margin-top:14px">No hay clases registradas en ese periodo.</p>'; return; }
-  const enRiesgo = r.alumnos.filter(a => a.pct !== null && a.pct < min).length;
-  let h = '<p class="mini" style="margin-top:14px"><strong>' + r.sesiones.length + '</strong> clase(s) · <strong>' + r.alumnos.length + '</strong> alumnos · ' +
-          '<strong style="color:var(--mal)">' + enRiesgo + '</strong> por debajo de ' + min + ' %</p>';
-  h += '<div class="tabla-wrap"><table><thead><tr><th class="nom">Alumno</th>' +
-       r.sesiones.map(s => '<th title="' + s.fecha + ' ' + s.hora + '">' + fechaCorta(s.fecha) + '<br>' + s.hora + '</th>').join('') +
-       '<th>A</th><th>R</th><th>F</th><th>%</th></tr></thead><tbody>';
-  r.alumnos.forEach(a => {
-    h += '<tr><td class="nom">' + esc(a.nombre) + '<br><span class="mini">' + esc(a.matricula) + '</span></td>' +
-         a.estados.map(e => { const l = LETRA[e] || (e ? e.charAt(0) : '·'); return '<td class="c-' + l + '">' + l + '</td>'; }).join('') +
-         '<td>' + a.A + '</td><td>' + a.R + '</td><td>' + a.F + '</td>' +
-         '<td class="' + (a.pct !== null && a.pct < min ? 'bajo' : '') + '">' + (a.pct === null ? '—' : a.pct + ' %') + '</td></tr>';
-  });
-  h += '</tbody></table></div><p class="leyenda">A = asistencia · R = retardo · F = falta · · = sin registro (pase abierto). El % cuenta asistencias + retardos sobre las clases registradas.</p>';
+  if (!r.sesiones.length) { $('repSalida').innerHTML = '<p class="mini" style="margin-top:14px">No hay clases registradas en ese periodo.</p>'; $('btnCsv').classList.add('oculto'); return; }
+  const conDato = r.alumnos.filter(a => a.pct !== null);
+  const enRiesgo = conDato.filter(a => a.pct < min).length;
+  const prom = conDato.length ? Math.round(conDato.reduce((t, a) => t + a.pct, 0) / conDato.length) : null;
+
+  let h = '<div class="resumen">' +
+    '<div class="dato"><span>Clases</span><b>' + r.sesiones.length + '</b></div>' +
+    '<div class="dato"><span>Alumnos</span><b>' + r.alumnos.length + '</b></div>' +
+    '<div class="dato"><span>Promedio</span><b>' + (prom === null ? '—' : prom + '%') + '</b></div>' +
+    '<div class="dato ' + (enRiesgo ? 'alerta' : '') + '"><span>Bajo ' + min + '%</span><b>' + enRiesgo + '</b></div></div>';
+
+  h += '<div class="vista-barra"><div class="segmento">' +
+    '<button data-v="alumno" class="' + (VISTA === 'alumno' ? 'activo' : '') + '">Por alumno</button>' +
+    '<button data-v="clase" class="' + (VISTA === 'clase' ? 'activo' : '') + '">Por clase</button></div>' +
+    (VISTA === 'alumno' ? '<select id="repOrden" class="orden"><option value="nombre">Orden: nombre</option><option value="pct">Orden: menor asistencia</option></select>' : '') +
+    '</div>';
+
+  if (VISTA === 'alumno') {
+    const lista = r.alumnos.slice();
+    if (ORDEN === 'pct') lista.sort((a, b) => (a.pct === null ? 999 : a.pct) - (b.pct === null ? 999 : b.pct));
+    h += '<ul class="rep-lista">' + lista.map(a => {
+      const nv = nivel(a.pct, min);
+      return '<li class="rep-alumno">' +
+        '<div class="rep-cab"><div class="rep-nombre">' + esc(nombreBonito(a.nombre)) +
+        '<div class="rep-cuentas"><span class="c-A">' + pl(a.A, 'asistencia', 'asistencias') + '</span><span class="c-R">' + pl(a.R, 'retardo', 'retardos') + '</span><span class="c-F">' + pl(a.F, 'falta', 'faltas') + '</span></div></div>' +
+        '<div class="pct ' + nv + '">' + (a.pct === null ? '—' : Math.round(a.pct) + '%') + '</div></div>' +
+        '<div class="historial">' + a.estados.map((e, i) => {
+          const s = r.sesiones[i];
+          return '<span class="punto-h ' + claseEstado(e) + '" title="' + fechaCorta(s.fecha) + ' ' + s.hora + ' · ' + (e || 'sin registro') + '"></span>';
+        }).join('') + '</div></li>';
+    }).join('') + '</ul>';
+    h += '<p class="leyenda"><span class="punto-h A"></span> asistencia <span class="punto-h R"></span> retardo <span class="punto-h F"></span> falta <span class="punto-h P"></span> sin registro · cada cuadro es una clase, de la más antigua a la más reciente. El % cuenta asistencias + retardos.</p>';
+  } else {
+    h += '<ul class="rep-lista">' + r.sesiones.slice().reverse().map(s => {
+      const i = r.sesiones.indexOf(s);
+      const est = r.alumnos.map(a => ({ n: a.nombre, e: a.estados[i] }));
+      const c = k => est.filter(x => claseEstado(x.e) === k);
+      const A = c('A'), R = c('R'), F = c('F'), tot = r.alumnos.length || 1;
+      const pres = Math.round((A.length + R.length) / tot * 100);
+      const nombres = (arr) => arr.map(x => esc(nombreBonito(x.n))).join(', ');
+      return '<li class="rep-clase"><details><summary>' +
+        '<div class="rep-cab"><div class="rep-nombre">' + fechaLarga(s.fecha) + ' · ' + s.hora + (s.abierta ? ' <span class="tag R">abierto</span>' : '') +
+        '<div class="rep-cuentas"><span class="c-A">' + pl(A.length, 'asistencia', 'asistencias') + '</span><span class="c-R">' + pl(R.length, 'retardo', 'retardos') + '</span><span class="c-F">' + pl(F.length, 'falta', 'faltas') + '</span></div></div>' +
+        '<div class="pct ' + nivel(pres, min) + '">' + pres + '%</div></div>' +
+        '<div class="barra-clase"><i class="A" style="width:' + (A.length / tot * 100) + '%"></i><i class="R" style="width:' + (R.length / tot * 100) + '%"></i><i class="F" style="width:' + (F.length / tot * 100) + '%"></i></div>' +
+        '</summary><div class="detalle-clase">' +
+        (F.length ? '<p><b class="c-F">Faltaron:</b> ' + nombres(F) + '</p>' : '<p class="c-A"><b>Sin faltas</b></p>') +
+        (R.length ? '<p><b class="c-R">Con retardo:</b> ' + nombres(R) + '</p>' : '') +
+        '</div></details></li>';
+    }).join('') + '</ul><p class="leyenda">Toca una clase para ver quién faltó o llegó tarde.</p>';
+  }
+
   $('repSalida').innerHTML = h;
   $('btnCsv').classList.remove('oculto');
+  $('repSalida').querySelectorAll('[data-v]').forEach(b => b.onclick = () => { VISTA = b.dataset.v; pintarReporte(); });
+  if ($('repOrden')) { $('repOrden').value = ORDEN; $('repOrden').onchange = e => { ORDEN = e.target.value; pintarReporte(); }; }
 }
 
-$('btnCsv').onclick = () => {
-  const r = REP;
-  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-  const filas = [['Matrícula', 'Nombre'].concat(r.sesiones.map(s => s.fecha + ' ' + s.hora), ['Asistencias', 'Retardos', 'Faltas', '% Asistencia'])];
-  r.alumnos.forEach(a => filas.push([a.matricula, a.nombre].concat(a.estados.map(e => LETRA[e] || e), [a.A, a.R, a.F, a.pct === null ? '' : a.pct])));
-  const csv = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = ('asistencia_' + r.grupo + '_' + ($('repDesde').value || 'inicio') + '_' + ($('repHasta').value || 'hoy')).replace(/[^\w\-]+/g, '_') + '.csv';
-  a.click();
+function fechaLarga(f) {
+  const d = new Date(f + 'T12:00:00');
+  const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  return dias[d.getDay()] + ' ' + d.getDate() + ' ' + meses[d.getMonth()];
+}
+
+function cargarScript(src) {
+  return new Promise((res, rej) => {
+    if (document.querySelector('script[src="' + src + '"]')) return res();
+    const t = document.createElement('script'); t.src = src; t.onload = res; t.onerror = () => rej(new Error('No se pudo cargar el generador de Excel. Revisa tu conexión.'));
+    document.head.appendChild(t);
+  });
+}
+
+$('btnCsv').onclick = async () => {
+  const b = $('btnCsv'), txt = b.textContent;
+  b.disabled = true; b.textContent = 'Generando…';
+  try {
+    await cargarScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
+    await exportarExcel();
+  } catch (e) { alert(e.message); }
+  finally { b.disabled = false; b.textContent = txt; }
 };
+
+async function exportarExcel() {
+  const r = REP, min = Number($('repMin').value) || 0;
+  const g = DATOS.grupos.find(x => x.clave === REP.clave) || { grupo: REP.clave, materia: '', plantel: '' };
+  const desde = r.sesiones[0].fecha, hasta = r.sesiones[r.sesiones.length - 1].fecha;
+  const fmt = f => { const p = f.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; };
+  const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const repetidas = {}; r.sesiones.forEach(s => repetidas[s.fecha] = (repetidas[s.fecha] || 0) + 1);
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Pase de lista';
+  const ws = wb.addWorksheet('Asistencia', { views: [{ state: 'frozen', xSplit: 2, ySplit: 7 }], pageSetup: { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
+  const nCols = 2 + r.sesiones.length + 4;
+  const MARINO = 'FF0F2557', GRIS = 'FFF5F7FA', BORDE = 'FFE2E7EE';
+  const color = { Asistencia: ['FFE3F4EA', 'FF1D7A46'], Retardo: ['FFFBF1DE', 'FF9A6212'], Falta: ['FFFBEAEA', 'FF8B1A1A'] };
+  const borde = { top: { style: 'thin', color: { argb: BORDE } }, left: { style: 'thin', color: { argb: BORDE } }, bottom: { style: 'thin', color: { argb: BORDE } }, right: { style: 'thin', color: { argb: BORDE } } };
+
+  ws.mergeCells(1, 1, 1, nCols);
+  const t = ws.getCell(1, 1); t.value = 'Reporte de asistencia'; t.font = { bold: true, size: 16, color: { argb: MARINO } };
+  const info = [['Materia', g.materia], ['Grupo', g.grupo], ['Plantel', g.plantel], ['Periodo', fmt(desde) + ' al ' + fmt(hasta) + ' (' + r.sesiones.length + ' clases)']];
+  info.forEach((par, i) => {
+    ws.mergeCells(2 + i, 1, 2 + i, nCols);
+    ws.getCell(2 + i, 1).value = { richText: [
+      { text: par[0] + ':  ', font: { bold: true, color: { argb: 'FF44546A' } } },
+      { text: String(par[1] || ''), font: { bold: i === 0, size: i === 0 ? 12 : 11, color: { argb: MARINO } } }
+    ] };
+  });
+
+  const enc = ['No.', 'Alumno'].concat(r.sesiones.map(s => {
+    const d = new Date(s.fecha + 'T12:00:00');
+    return dias[d.getDay()] + ' ' + s.fecha.slice(8, 10) + '/' + s.fecha.slice(5, 7) + (repetidas[s.fecha] > 1 ? ' ' + s.hora : '');
+  }), ['Asistencias', 'Retardos', 'Faltas', '% Asistencia']);
+  const fe = ws.getRow(7);
+  enc.forEach((v, i) => {
+    const c = fe.getCell(i + 1); c.value = v;
+    c.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: MARINO } };
+    c.alignment = { horizontal: i === 1 ? 'left' : 'center', vertical: 'middle', wrapText: true };
+    c.border = borde;
+  });
+  fe.height = 30;
+
+  r.alumnos.forEach((a, k) => {
+    const fila = ws.getRow(8 + k);
+    const vals = [k + 1, nombreBonito(a.nombre)].concat(a.estados.map(e => e || 'Sin registro'), [a.A, a.R, a.F, a.pct === null ? null : a.pct / 100]);
+    vals.forEach((v, i) => {
+      const c = fila.getCell(i + 1); c.value = v; c.border = borde;
+      c.alignment = { horizontal: i === 1 ? 'left' : 'center', vertical: 'middle' };
+      if (k % 2) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRIS } };
+      if (i >= 2 && i < 2 + r.sesiones.length && color[v]) {
+        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: color[v][0] } };
+        c.font = { color: { argb: color[v][1] }, bold: v !== 'Asistencia' };
+      }
+      if (i === vals.length - 1 && v !== null) {
+        c.numFmt = '0%'; c.font = { bold: true, color: { argb: a.pct < min ? 'FF8B1A1A' : 'FF1D7A46' } };
+        if (a.pct < min) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBEAEA' } };
+      }
+    });
+  });
+
+  const fin = 8 + r.alumnos.length + 1;
+  ws.getCell(fin, 2).value = 'El % considera asistencias + retardos sobre las clases registradas. Mínimo requerido: ' + min + '%.';
+  ws.getCell(fin, 2).font = { italic: true, size: 9, color: { argb: 'FF6B7A90' } };
+
+  ws.getColumn(1).width = 5;
+  ws.getColumn(2).width = Math.max(28, Math.min(46, Math.max(...r.alumnos.map(a => a.nombre.length)) + 4));
+  for (let i = 3; i <= 2 + r.sesiones.length; i++) ws.getColumn(i).width = 13;
+  for (let i = 3 + r.sesiones.length; i <= nCols; i++) ws.getColumn(i).width = 13;
+
+  const buf = await wb.xlsx.writeBuffer();
+  const limpio = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\-]+/g, '_').replace(/_+/g, '_');
+  const nombre = 'Asistencia_' + limpio(g.materia) + '_' + limpio(g.grupo) + '_' + desde + '_a_' + hasta + '.xlsx';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+  a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
 
 /* ---------- Planteles ---------- */
 function pintarPlanteles() {
