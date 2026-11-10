@@ -38,8 +38,8 @@
     <div class="tiempo"><div id="barra"></div></div>
     <p class="mini" id="lblTiempo"></p>
 
-    <label for="inMat">Matrícula</label>
-    <input id="inMat" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Escribe tu matrícula">
+    <label for="inMat">Tu nombre</label>
+    <select id="inMat"><option value="">Selecciona tu nombre…</option></select>
 
     <div id="ubic" class="ubic">
       <span class="punto"></span><span id="ubicTxt">Obteniendo ubicación…</span>
@@ -89,7 +89,10 @@ async function validar(codigo) {
     $('lblMateria').textContent = r.materia;
     $('lblGrupo').textContent = r.grupo;
     $('lblPlantel').textContent = r.plantel;
-    $('inMat').value = leer('asis_mat') || '';
+    const previo = leer('asis_mat') || '';
+    $('inMat').innerHTML = '<option value="">Selecciona tu nombre…</option>' +
+      (r.alumnos || []).map(a => '<option value="' + esc(a.id) + '">' + esc(a.nombre) + '</option>').join('');
+    if ((r.alumnos || []).some(a => a.id === previo)) $('inMat').value = previo;
     mostrar('pRegistro');
     iniciarReloj();
     if (requiereUbic) pedirUbicacion();
@@ -137,7 +140,7 @@ $('btnUbic').onclick = pedirUbicacion;
 
 $('btnRegistrar').onclick = async () => {
   const m = $('inMat').value.trim();
-  if (!m) { error('Escribe tu matrícula.'); return; }
+  if (!m) { error('Selecciona tu nombre en la lista.'); return; }
   error('');
   const b = $('btnRegistrar');
   b.disabled = true; b.textContent = 'Registrando…';
@@ -162,7 +165,6 @@ $('btnRegistrar').onclick = async () => {
 
 $('btnCodigo').onclick = () => validar($('inCodigo').value);
 $('inCodigo').addEventListener('keydown', e => { if (e.key === 'Enter') validar($('inCodigo').value); });
-$('inMat').addEventListener('keydown', e => { if (e.key === 'Enter' && !$('btnRegistrar').disabled) $('btnRegistrar').click(); });
 
 // Inicio: si viene del QR, el código está en la URL
 const c = new URLSearchParams(location.search).get('c');
