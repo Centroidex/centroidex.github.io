@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Registro de asistencia</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="logo">✓</div>
+    <div>
+      <h1>Registro de asistencia</h1>
+      <p class="sub">Aula Centroide</p>
+    </div>
+  </header>
+
+  <!-- Paso 1: código -->
+  <section id="pCodigo" class="card oculto">
+    <h2>Código de la clase</h2>
+    <p class="mini">Escanea el QR proyectado o escribe el código de 6 dígitos que aparece debajo de él.</p>
+    <input id="inCodigo" class="codigo" inputmode="numeric" maxlength="7" placeholder="000000" autocomplete="off">
+    <button id="btnCodigo" class="btn">Continuar</button>
+  </section>
+
+  <!-- Paso 2: matrícula y ubicación -->
+  <section id="pRegistro" class="card oculto">
+    <div class="clase">
+      <span id="lblMateria"></span>
+      <strong id="lblGrupo"></strong>
+      <span id="lblPlantel"></span>
+    </div>
+    <div class="tiempo"><div id="barra"></div></div>
+    <p class="mini" id="lblTiempo"></p>
+
+    <label for="inMat">Matrícula</label>
+    <input id="inMat" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Escribe tu matrícula">
+
+    <div id="ubic" class="ubic">
+      <span class="punto"></span><span id="ubicTxt">Obteniendo ubicación…</span>
+      <button id="btnUbic" class="link oculto">Reintentar</button>
+    </div>
+
+    <button id="btnRegistrar" class="btn" disabled>Registrar asistencia</button>
+  </section>
+
+  <!-- Paso 3: confirmación -->
+  <section id="pListo" class="card centro oculto">
+    <div id="sello" class="sello">✓</div>
+    <p class="grande" id="lblEstado"></p>
+    <p id="lblNombre" style="margin:6px 0 0;font-weight:600"></p>
+    <p class="mini" id="lblHora"></p>
+    <p class="mini">Ya puedes cerrar esta página.</p>
+  </section>
+
+  <p id="error" class="error oculto"></p>
+</main>
+
+<script src="comun.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let pase = null, vence = 0, total = 180, ubic = null, requiereUbic = true, reloj = null;
+
+function mostrar(id) { ['pCodigo', 'pRegistro', 'pListo'].forEach(p => $(p).classList.toggle('oculto', p !== id)); }
+function error(m) { $('error').textContent = m || ''; $('error').classList.toggle('oculto', !m); }
+
+// Identificador del celular (se guarda en el navegador)
+function dispositivo() {
+  let d = leer('asis_dev');
+  if (!d) { const m = document.cookie.match(/(?:^|;\s*)asis_dev=([\w-]+)/); d = m ? m[1] : null; }
+  if (!d) d = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  guardar('asis_dev', d);
+  document.cookie = 'asis_dev=' + d + ';max-age=157680000;path=/;SameSite=Lax';
+  return d;
+}
+const DEV = dispositivo();
+
+async function validar(codigo) {
+  error('');
+  $('btnCodigo').disabled = true; $('btnCodigo').textContent = 'Verificando…';
+  try {
+    const r = await api('validarCodigo', { codigo: codigo, dispositivo: DEV });
+    pase = r.pase; requiereUbic = r.requiereUbicacion; total = r.vigencia; vence = Date.now() + total * 1000;
+    $('lblMateria').textContent = r.materia;
+    $('lblGrupo').textContent = r.grupo;
+    $('lblPlantel').textContent = r.plantel;
+    $('inMat').value = leer('asis_mat') || '';
+    mostrar('pRegistro');
+    iniciarReloj();
+    if (requiereUbic) pedirUbicacion();
+    else { $('ubic').className = 'ubic ok'; $('ubicTxt').textContent = 'Esta clase no requiere ubicación.'; listo(); }
+  } catch (e) {
+    mostrar('pCodigo'); error(e.message);
+  } finally {
+    $('btnCodigo').disabled = false; $('btnCodigo').textContent = 'Continuar';
+  }
+}
+
+function iniciarReloj() {
+  clearInterval(reloj);
+  const paso = () => {
+    const s = Math.max(0, Math.round((vence - Date.now()) / 1000));
+    $('barra').style.width = (s / total * 100) + '%';
+    $('lblTiempo').textContent = s
+      ? 'Tienes ' + Math.floor(s / 60) + ':' + pad2(s % 60) + ' para registrarte'
+      : 'Tiempo agotado: vuelve a escanear el código proyectado.';
+    if (!s) { clearInterval(reloj); $('btnRegistrar').disabled = true; }
+  };
+  paso(); reloj = setInterval(paso, 500);
+}
+
+async function pedirUbicacion() {
+  $('btnUbic').classList.add('oculto');
+  $('ubic').className = 'ubic';
+  $('ubicTxt').textContent = 'Obteniendo ubicación…';
+  try {
+    ubic = await mejorUbicacion(15000, 35);
+    $('ubic').className = 'ubic ok';
+    $('ubicTxt').textContent = 'Ubicación lista (±' + Math.round(ubic.acc) + ' m)';
+  } catch (e) {
+    ubic = null;
+    $('ubic').className = 'ubic mal';
+    $('ubicTxt').textContent = e.message;
+    $('btnUbic').classList.remove('oculto');
+  }
+  listo();
+}
+
+function listo() { $('btnRegistrar').disabled = !(pase && Date.now() < vence && (!requiereUbic || ubic)); }
+
+$('btnUbic').onclick = pedirUbicacion;
+
+$('btnRegistrar').onclick = async () => {
+  const m = $('inMat').value.trim();
+  if (!m) { error('Escribe tu matrícula.'); return; }
+  error('');
+  const b = $('btnRegistrar');
+  b.disabled = true; b.textContent = 'Registrando…';
+  try {
+    const r = await api('registrar', Object.assign({ pase: pase, matricula: m, dispositivo: DEV }, ubic || {}));
+    guardar('asis_mat', m);
+    clearInterval(reloj);
+    const ret = r.estado === 'Retardo';
+    $('sello').className = 'sello' + (ret ? ' ret' : '');
+    $('sello').textContent = ret ? '⏱' : '✓';
+    $('lblEstado').textContent = r.yaRegistrado ? 'Ya estabas registrado' : (ret ? 'Registrado con retardo' : '¡Asistencia registrada!');
+    $('lblNombre').textContent = r.nombre;
+    $('lblHora').textContent = (r.yaRegistrado ? 'Registro previo: ' : 'Hora: ') + String(r.hora).slice(0, 5) + ' · ' + r.estado;
+    mostrar('pListo');
+  } catch (e) {
+    error(e.message);
+    listo();
+  } finally {
+    b.textContent = 'Registrar asistencia';
+  }
+};
+
+$('btnCodigo').onclick = () => validar($('inCodigo').value);
+$('inCodigo').addEventListener('keydown', e => { if (e.key === 'Enter') validar($('inCodigo').value); });
+$('inMat').addEventListener('keydown', e => { if (e.key === 'Enter' && !$('btnRegistrar').disabled) $('btnRegistrar').click(); });
+
+// Inicio: si viene del QR, el código está en la URL
+const c = new URLSearchParams(location.search).get('c');
+if (c) { history.replaceState(null, '', location.pathname); validar(c); }
+else mostrar('pCodigo');
+</script>
+</body>
+</html>

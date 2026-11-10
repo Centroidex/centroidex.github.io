@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pase de lista · Docente</title>
+<link rel="stylesheet" href="estilos.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<main id="vLogin" class="wrap">
+  <header class="top">
+    <div class="logo">✓</div>
+    <div><h1>Pase de lista</h1><p class="sub">Acceso docente</p></div>
+  </header>
+  <section class="card">
+    <label for="inPin" style="margin-top:0">PIN</label>
+    <input id="inPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••">
+    <label class="check"><input type="checkbox" id="chkRecordar" checked> Recordar en este dispositivo</label>
+    <button id="btnEntrar" class="btn">Entrar</button>
+  </section>
+  <p id="errLogin" class="error oculto"></p>
+</main>
+
+<!-- ================= PANEL ================= -->
+<main id="vPanel" class="wrap ancho oculto">
+  <header class="top">
+    <div class="logo">✓</div>
+    <div><h1>Pase de lista</h1><p class="sub">Panel docente</p></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab activo" data-t="tLista">Pase de lista</button>
+    <button class="tab" data-t="tReportes">Reportes</button>
+    <button class="tab" data-t="tPlanteles">Planteles</button>
+    <span class="esp"></span>
+    <button id="btnSalir" class="link">Cerrar sesión</button>
+  </nav>
+
+  <p id="errPanel" class="error oculto"></p>
+
+  <!-- Pase de lista -->
+  <section id="tLista" class="card">
+    <div id="abiertas"></div>
+    <h2>Nuevo pase de lista</h2>
+    <label for="selGrupo">Grupo</label>
+    <select id="selGrupo"></select>
+    <div class="fila">
+      <div>
+        <label for="inInicio">Hora de inicio de la clase</label>
+        <input type="time" id="inInicio">
+      </div>
+      <div>
+        <label for="selInt">Cambio de código</label>
+        <select id="selInt">
+          <option value="20">Cada 20 s (proyector)</option>
+          <option value="45">Cada 45 s (celular)</option>
+        </select>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="chkUbic">
+      Usar mi ubicación actual como referencia (recomendado si estás en el salón con tu celular)</label>
+    <p class="mini" id="txtRef"></p>
+    <button id="btnIniciar" class="btn">Iniciar pase de lista</button>
+  </section>
+
+  <!-- Reportes -->
+  <section id="tReportes" class="card oculto">
+    <h2>Reportes de asistencia</h2>
+    <div class="fila">
+      <div><label for="repGrupo">Grupo</label><select id="repGrupo"></select></div>
+      <div><label for="repDesde">Desde</label><input type="date" id="repDesde"></div>
+      <div><label for="repHasta">Hasta</label><input type="date" id="repHasta"></div>
+      <div><label for="repMin">Mínimo requerido (%)</label><input type="number" id="repMin" value="80" min="0" max="100"></div>
+    </div>
+    <div class="rangos">
+      <button class="btn sec chico" data-r="hoy">Hoy</button>
+      <button class="btn sec chico" data-r="semana">Esta semana</button>
+      <button class="btn sec chico" data-r="mes">Este mes</button>
+      <button class="btn sec chico" data-r="todo">Todo el ciclo</button>
+      <button class="btn chico" id="btnRep">Consultar</button>
+      <button class="btn sec chico oculto" id="btnCsv">Descargar Excel (CSV)</button>
+    </div>
+    <div id="repSalida"></div>
+  </section>
+
+  <!-- Planteles -->
+  <section id="tPlanteles" class="card oculto">
+    <h2>Ubicación de los planteles</h2>
+    <p class="mini">Hazlo una sola vez por plantel, desde tu celular y estando dentro del plantel (de preferencia al aire libre).
+      El radio es la distancia máxima permitida desde ese punto.</p>
+    <div id="listaPlanteles"></div>
+  </section>
+</main>
+
+<!-- ================= PASE DE LISTA EN CURSO ================= -->
+<main id="vSesion" class="wrap ancho sesion oculto">
+  <div class="ses-top">
+    <div>
+      <h1 id="sTitulo"></h1>
+      <p class="sub" id="sSub"></p>
+    </div>
+    <div class="botones" style="margin:0">
+      <button class="btn sec chico" id="btnFull">Pantalla completa</button>
+      <button class="btn sec chico" id="btnVolver">Volver al panel</button>
+      <button class="btn peligro chico" id="btnCerrar">Cerrar y marcar faltas</button>
+    </div>
+  </div>
+
+  <div class="ses-cuerpo">
+    <section class="card qrbox">
+      <img id="qr" alt="Código QR de asistencia">
+      <p class="codigo-grande" id="sCodigo">— — —</p>
+      <p class="url-alumno" id="sUrl"></p>
+      <div class="tiempo"><div id="sBarra"></div></div>
+      <p class="mini" id="sEstado"></p>
+    </section>
+
+    <section class="card">
+      <p class="contador"><span id="sCuenta">0</span> <small>/ <span id="sTotal">0</span> registrados</small></p>
+      <p class="mini" id="sDetalle"></p>
+      <ul class="lista" id="sLista"></ul>
+      <p class="mini" id="sRechazos"></p>
+    </section>
+  </div>
+</main>
+
+<script src="comun.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let PIN = null, DATOS = null, SES = null, codigoActual = '', finVentana = 0, ultimo = 0, ocupado = false, timer = null, wake = null, REP = null;
+const URL_ALUMNO = new URL('./', location.href).href;
+
+function vista(id) { ['vLogin', 'vPanel', 'vSesion'].forEach(v => $(v).classList.toggle('oculto', v !== id)); }
+function err(id, m) { $(id).textContent = m || ''; $(id).classList.toggle('oculto', !m); }
+const llamar = (accion, datos) => api(accion, Object.assign({ pin: PIN }, datos || {}));
+
+/* ---------- Login ---------- */
+async function entrar(pin, recordar) {
+  err('errLogin', '');
+  $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
+  try {
+    PIN = pin;
+    DATOS = await llamar('login');
+    if (recordar) guardar('asis_pin', pin); else { borrar('asis_pin'); sessionStorage.setItem('asis_pin', pin); }
+    pintarPanel();
+    vista('vPanel');
+  } catch (e) {
+    PIN = null; borrar('asis_pin'); sessionStorage.removeItem('asis_pin');
+    vista('vLogin'); err('errLogin', e.message);
+  } finally {
+    $('btnEntrar').disabled = false; $('btnEntrar').textContent = 'Entrar';
+  }
+}
+$('btnEntrar').onclick = () => entrar($('inPin').value.trim(), $('chkRecordar').checked);
+$('inPin').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnEntrar').click(); });
+$('btnSalir').onclick = () => { borrar('asis_pin'); sessionStorage.removeItem('asis_pin'); PIN = null; $('inPin').value = ''; vista('vLogin'); };
+
+async function recargar() { try { DATOS = await llamar('login'); pintarPanel(); } catch (e) { err('errPanel', e.message); } }
+
+/* ---------- Panel ---------- */
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('activo', x === b));
+  ['tLista', 'tReportes', 'tPlanteles'].forEach(t => $(t).classList.toggle('oculto', t !== b.dataset.t));
+});
+
+function opcionesGrupos(sel) {
+  const previo = sel.value;
+  const porPlantel = {};
+  DATOS.grupos.forEach(g => (porPlantel[g.plantel || 'Sin plantel'] = porPlantel[g.plantel || 'Sin plantel'] || []).push(g));
+  sel.innerHTML = Object.keys(porPlantel).map(p =>
+    '<optgroup label="' + esc(p) + '">' + porPlantel[p].map(g =>
+      '<option value="' + esc(g.clave) + '">' + esc(g.grupo) + (g.materia ? ' · ' + esc(g.materia) : '') + '</option>').join('') + '</optgroup>').join('');
+  if (previo) sel.value = previo;
+}
+
+function pintarPanel() {
+  err('errPanel', '');
+  if (!DATOS.grupos.length) err('errPanel', 'No hay grupos dados de alta. Llena la hoja "Grupos" en Google Sheets.');
+  opcionesGrupos($('selGrupo'));
+  opcionesGrupos($('repGrupo'));
+  const d = new Date();
+  if (!$('inInicio').value) $('inInicio').value = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  if (matchMedia('(max-width: 760px)').matches) { $('selInt').value = '45'; $('chkUbic').checked = true; }
+  actualizarRef();
+
+  $('abiertas').innerHTML = DATOS.abiertas.length
+    ? '<h2>Pases de lista abiertos</h2>' + DATOS.abiertas.map(s =>
+        '<div class="abierta"><div><strong>' + esc(s.grupo) + '</strong><br><span class="mini">' + esc(s.materia) + ' · ' + s.fecha + ' ' + s.inicio +
+        '</span></div><button class="btn chico" data-id="' + s.id + '">Reanudar</button></div>').join('') + '<hr style="border:0;border-top:1px solid var(--borde);margin:16px 0">'
+    : '';
+  $('abiertas').querySelectorAll('button[data-id]').forEach(b => b.onclick = () => abrirVista(DATOS.abiertas.find(s => s.id === b.dataset.id)));
+
+  pintarPlanteles();
+}
+
+function plantelDe(clave) { const g = DATOS.grupos.find(x => x.clave === clave); return g ? DATOS.planteles.find(p => p.plantel === g.plantel) : null; }
+function actualizarRef() {
+  const p = plantelDe($('selGrupo').value);
+  $('txtRef').textContent = $('chkUbic').checked
+    ? 'Se usará la ubicación de este dispositivo como centro (requiere precisión de ±60 m o mejor; si no, se usa la del plantel).'
+    : (p && p.lat !== null ? 'Se verificará contra la ubicación guardada del plantel (radio ' + p.radio + ' m).'
+                           : '⚠ Este plantel aún no tiene ubicación guardada: activa la casilla o fíjala en la pestaña Planteles.');
+}
+$('selGrupo').onchange = actualizarRef;
+$('chkUbic').onchange = actualizarRef;
+
+$('btnIniciar').onclick = async () => {
+  const b = $('btnIniciar');
+  b.disabled = true; err('errPanel', '');
+  try {
+    let u = {};
+    if ($('chkUbic').checked) {
+      b.textContent = 'Obteniendo tu ubicación…';
+      try { u = await mejorUbicacion(15000, 25); } catch (e) { u = {}; }
+    }
+    b.textContent = 'Iniciando…';
+    const r = await llamar('abrirSesion', Object.assign({ clave: $('selGrupo').value, inicio: $('inInicio').value, intervalo: $('selInt').value }, u));
+    abrirVista(r.sesion);
+  } catch (e) {
+    err('errPanel', e.message);
+  } finally {
+    b.disabled = false; b.textContent = 'Iniciar pase de lista';
+  }
+};
+
+/* ---------- Pase de lista en curso ---------- */
+async function abrirVista(s) {
+  SES = s; codigoActual = ''; finVentana = 0;
+  $('sTitulo').textContent = s.grupo;
+  $('sSub').textContent = [s.materia, s.plantel, 'Inicio ' + s.inicio, s.referencia].filter(Boolean).join(' · ');
+  $('sUrl').textContent = URL_ALUMNO.replace(/^https?:\/\//, '');
+  $('sLista').innerHTML = ''; $('sCodigo').textContent = '— — —'; $('qr').removeAttribute('src');
+  vista('vSesion');
+  try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
+  await refrescar();
+  clearInterval(timer); timer = setInterval(tick, 500);
+}
+
+async function refrescar() {
+  try {
+    const r = await llamar('estadoSesion', { sesionId: SES.id });
+    if (!r.abierta) { $('sEstado').textContent = 'Este pase de lista ya está cerrado.'; $('sCodigo').textContent = 'Cerrado'; $('qr').removeAttribute('src'); clearInterval(timer); }
+    else {
+      if (r.codigo !== codigoActual) { codigoActual = r.codigo; pintarQR(r.codigo); }
+      finVentana = Date.now() + r.restante * 1000;
+      $('sEstado').textContent = 'El código cambia cada ' + SES.intervalo + ' s';
+    }
+    pintarLista(r);
+  } catch (e) {
+    $('sEstado').textContent = 'Reconectando… (' + e.message + ')';
+    finVentana = Date.now() + 3000;
+  }
+  ultimo = Date.now();
+}
+
+async function tick() {
+  const rest = Math.max(0, (finVentana - Date.now()) / 1000);
+  $('sBarra').style.width = Math.min(100, rest / SES.intervalo * 100) + '%';
+  if (!ocupado && (rest <= 0.2 || Date.now() - ultimo > 5000)) { ocupado = true; await refrescar(); ocupado = false; }
+}
+
+function pintarQR(c) {
+  const qr = qrcode(0, 'M');
+  qr.addData(URL_ALUMNO + '?c=' + c);
+  qr.make();
+  $('qr').src = qr.createDataURL(10, 2);
+  $('sCodigo').textContent = c.slice(0, 3) + ' ' + c.slice(3);
+}
+
+function pintarLista(r) {
+  const presentes = r.registros.filter(x => x.estado !== 'Falta');
+  const nA = presentes.filter(x => x.estado === 'Asistencia').length;
+  $('sCuenta').textContent = presentes.length;
+  $('sTotal').textContent = r.total;
+  $('sDetalle').textContent = nA + ' a tiempo · ' + (presentes.length - nA) + ' con retardo';
+  const ord = r.registros.slice().reverse();
+  $('sLista').innerHTML = ord.map(x => {
+    const k = x.estado === 'Asistencia' ? 'A' : x.estado === 'Retardo' ? 'R' : 'F';
+    return '<li><span>' + esc(x.nombre) + (x.obs ? '<span class="obs">⚠ ' + esc(x.obs) + '</span>' : '') + '</span>' +
+           '<span><span class="mini">' + esc(x.hora) + '</span> <span class="tag ' + k + '">' + esc(x.estado) + '</span></span></li>';
+  }).join('');
+  $('sRechazos').textContent = r.rechazados.length ? '⚠ ' + r.rechazados.length + ' intento(s) rechazado(s) — detalle en la hoja "Intentos".' : '';
+}
+
+$('btnVolver').onclick = () => { clearInterval(timer); if (wake) wake.release().catch(() => {}); vista('vPanel'); recargar(); };
+$('btnFull').onclick = () => { const d = document.documentElement; if (!document.fullscreenElement) (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d); else document.exitFullscreen(); };
+$('btnCerrar').onclick = async () => {
+  if (!confirm('¿Cerrar el pase de lista?\n\nLos alumnos que no se registraron quedarán con FALTA y ya nadie podrá registrarse.')) return;
+  try {
+    const r = await llamar('cerrarSesion', { sesionId: SES.id });
+    clearInterval(timer); if (wake) wake.release().catch(() => {});
+    alert('Pase de lista cerrado. Faltas registradas: ' + r.faltas);
+    vista('vPanel'); recargar();
+  } catch (e) { alert(e.message); }
+};
+
+/* ---------- Reportes ---------- */
+document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+  const h = new Date(); let d = '', a = '';
+  if (b.dataset.r === 'hoy') { d = a = ymd(h); }
+  if (b.dataset.r === 'semana') { const l = new Date(h); l.setDate(h.getDate() - ((h.getDay() + 6) % 7)); const dm = new Date(l); dm.setDate(l.getDate() + 6); d = ymd(l); a = ymd(dm); }
+  if (b.dataset.r === 'mes') { d = ymd(new Date(h.getFullYear(), h.getMonth(), 1)); a = ymd(new Date(h.getFullYear(), h.getMonth() + 1, 0)); }
+  $('repDesde').value = d; $('repHasta').value = a;
+  consultar();
+});
+$('btnRep').onclick = consultar;
+$('repMin').oninput = () => REP && pintarReporte();
+
+async function consultar() {
+  $('repSalida').innerHTML = '<p class="mini">Consultando…</p>';
+  $('btnCsv').classList.add('oculto');
+  try {
+    REP = await llamar('reporte', { clave: $('repGrupo').value, desde: $('repDesde').value, hasta: $('repHasta').value });
+    REP.grupo = $('repGrupo').selectedOptions[0] ? $('repGrupo').selectedOptions[0].textContent : $('repGrupo').value;
+    pintarReporte();
+  } catch (e) { $('repSalida').innerHTML = '<p class="error">' + esc(e.message) + '</p>'; }
+}
+
+const LETRA = { 'Asistencia': 'A', 'Retardo': 'R', 'Falta': 'F' };
+function fechaCorta(f) { const p = f.split('-'); return p[2] + '/' + p[1]; }
+
+function pintarReporte() {
+  const r = REP, min = Number($('repMin').value) || 0;
+  if (!r.sesiones.length) { $('repSalida').innerHTML = '<p class="mini" style="margin-top:14px">No hay clases registradas en ese periodo.</p>'; return; }
+  const enRiesgo = r.alumnos.filter(a => a.pct !== null && a.pct < min).length;
+  let h = '<p class="mini" style="margin-top:14px"><strong>' + r.sesiones.length + '</strong> clase(s) · <strong>' + r.alumnos.length + '</strong> alumnos · ' +
+          '<strong style="color:var(--mal)">' + enRiesgo + '</strong> por debajo de ' + min + ' %</p>';
+  h += '<div class="tabla-wrap"><table><thead><tr><th class="nom">Alumno</th>' +
+       r.sesiones.map(s => '<th title="' + s.fecha + ' ' + s.hora + '">' + fechaCorta(s.fecha) + '<br>' + s.hora + '</th>').join('') +
+       '<th>A</th><th>R</th><th>F</th><th>%</th></tr></thead><tbody>';
+  r.alumnos.forEach(a => {
+    h += '<tr><td class="nom">' + esc(a.nombre) + '<br><span class="mini">' + esc(a.matricula) + '</span></td>' +
+         a.estados.map(e => { const l = LETRA[e] || (e ? e.charAt(0) : '·'); return '<td class="c-' + l + '">' + l + '</td>'; }).join('') +
+         '<td>' + a.A + '</td><td>' + a.R + '</td><td>' + a.F + '</td>' +
+         '<td class="' + (a.pct !== null && a.pct < min ? 'bajo' : '') + '">' + (a.pct === null ? '—' : a.pct + ' %') + '</td></tr>';
+  });
+  h += '</tbody></table></div><p class="leyenda">A = asistencia · R = retardo · F = falta · · = sin registro (pase abierto). El % cuenta asistencias + retardos sobre las clases registradas.</p>';
+  $('repSalida').innerHTML = h;
+  $('btnCsv').classList.remove('oculto');
+}
+
+$('btnCsv').onclick = () => {
+  const r = REP;
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const filas = [['Matrícula', 'Nombre'].concat(r.sesiones.map(s => s.fecha + ' ' + s.hora), ['Asistencias', 'Retardos', 'Faltas', '% Asistencia'])];
+  r.alumnos.forEach(a => filas.push([a.matricula, a.nombre].concat(a.estados.map(e => LETRA[e] || e), [a.A, a.R, a.F, a.pct === null ? '' : a.pct])));
+  const csv = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = ('asistencia_' + r.grupo + '_' + ($('repDesde').value || 'inicio') + '_' + ($('repHasta').value || 'hoy')).replace(/[^\w\-]+/g, '_') + '.csv';
+  a.click();
+};
+
+/* ---------- Planteles ---------- */
+function pintarPlanteles() {
+  if (!DATOS.planteles.length) { $('listaPlanteles').innerHTML = '<p class="mini">Aún no hay planteles. Da de alta grupos en la hoja "Grupos".</p>'; return; }
+  $('listaPlanteles').innerHTML = DATOS.planteles.map((p, i) =>
+    '<div class="plantel"><strong>' + esc(p.plantel) + '</strong><br>' +
+    (p.lat !== null
+      ? '<span class="mini">Ubicación guardada · <a target="_blank" rel="noopener" href="https://maps.google.com/?q=' + p.lat + ',' + p.lng + '">ver en mapa</a></span>'
+      : '<span class="mini" style="color:var(--mal)">Sin ubicación guardada</span>') +
+    '<div class="fila" style="align-items:end"><div><label>Radio permitido (m)</label><input type="number" min="50" max="1000" value="' + p.radio + '" id="rad' + i + '"></div>' +
+    '<div><button class="btn sec" data-i="' + i + '" style="margin-top:0">Fijar ubicación aquí</button></div></div>' +
+    '<p class="mini" id="pm' + i + '"></p></div>').join('');
+  $('listaPlanteles').querySelectorAll('button[data-i]').forEach(b => b.onclick = async () => {
+    const i = b.dataset.i, p = DATOS.planteles[i];
+    b.disabled = true; $('pm' + i).textContent = 'Obteniendo ubicación precisa (hasta 20 s)…';
+    try {
+      const u = await mejorUbicacion(20000, 20);
+      await llamar('fijarUbicacion', Object.assign({ plantel: p.plantel, radio: $('rad' + i).value }, u));
+      $('pm' + i).textContent = '✓ Guardada (precisión ±' + Math.round(u.acc) + ' m)';
+      await recargar();
+    } catch (e) { $('pm' + i).textContent = e.message; }
+    finally { b.disabled = false; }
+  });
+}
+
+/* ---------- Inicio ---------- */
+const pinGuardado = leer('asis_pin') || sessionStorage.getItem('asis_pin');
+if (pinGuardado) entrar(pinGuardado, !!leer('asis_pin')); else vista('vLogin');
+</script>
+</body>
+</html>
