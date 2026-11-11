@@ -1,26 +1,27 @@
 /* Material de clase — sistema de diseño (ver DESIGN.md) */
 :root{
-  --tinta:#0e1a2b; --tinta-2:#44546a; --tinta-3:#6b7a90;
+  --tinta:#0e1a2b; --tinta-2:#44546a; --tinta-3:#5b697e;
   --fondo:#ffffff; --superficie:#f5f7fa; --borde:#e2e7ee; --borde-2:#cfd7e3;
   --marino:#0f2557; --marino-2:#1a3670;
-  --naranja:#ff6b00; --naranja-texto:#c24e00; --naranja-suave:#fff1e6;
+  --naranja:#ff6b00; --naranja-texto:#b34700; --naranja-suave:#fff1e6;
   --primario:#1f4fd1; --primario-h:#1a42b0; --primario-suave:#e9effd;
   --tinto:#a3303c; --tinto-h:#8b2531; --tinto-suave:#fbeaec;
   --exito:#1d7a46; --exito-suave:#e3f4ea;
   --aviso:#8b1a1a; --aviso-suave:#fbeaea;
   --est:#1f4fd1; --est-s:#e9effd; --geo:#9a6212; --geo-s:#fbf1de;
-  --hid:#0b7a70; --hid-s:#dcf3ef; --arq:#5b3fa6; --arq-s:#efeafb;
+  --hid:#0a7068; --hid-s:#dcf3ef; --arq:#5b3fa6; --arq-s:#efeafb;
   --r-1:8px; --r-2:14px; --r-3:20px;
   --sombra-1:0 1px 2px rgba(14,26,43,.06), 0 1px 1px rgba(14,26,43,.04);
   --sombra-2:0 10px 28px rgba(14,26,43,.12);
   --ancho:1160px;
+  --alto-barra:96px;
   --f-marca:'Montserrat', 'Lexend', sans-serif;
   --f-tit:'Lexend', 'Segoe UI', system-ui, sans-serif;
   --f-txt:'Atkinson Hyperlegible', 'Segoe UI', Arial, sans-serif;
   --f-mat:'STIX Two Text', 'Cambria Math', Cambria, serif;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:var(--alto-barra)}
 body{margin:0;background:var(--fondo);color:var(--tinta);font-family:var(--f-txt);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
 img,svg{max-width:100%}
 a{color:var(--primario);text-underline-offset:3px}
@@ -408,3 +409,36 @@ a.materia:hover .franja .mini{transform:translateY(-3px) scale(1.04)}
 
 .leccion h3.subtema{font-size:19px;color:var(--marino);margin-top:6px}
 .leccion h3.subtema:first-child{margin-top:0}
+
+/* ---------- ajustes nov 2026 (revisión de diseño) ---------- */
+/* Anclas: el título nunca queda bajo la barra fija */
+.leccion section,.unidad,.panel-area{scroll-margin-top:var(--alto-barra)}
+/* Ejemplo resuelto: una ecuación por renglón */
+.ejemplo .lineas>span{display:block}
+/* Inicio: secciones de tres tarjetas sin tarjeta huérfana */
+@media (min-width:900px){.rejilla--3,.pasos{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:899px){.rejilla--3,.pasos{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){
+  :root{--alto-barra:128px}
+  /* Menú: textos cortos y aviso de que hay más a la derecha */
+  .nav a{font-size:14px;padding:8px 8px}
+  .nav{gap:0}
+  .nav .largo{display:none}
+  .nav{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+  /* Portada: la caja del código va justo después del título */
+  .portada .contenedor{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:28px;padding-bottom:36px}
+  .portada .contenedor>div:first-child{display:contents}
+  .portada h1{order:1;font-size:34px;margin:10px 0 18px}
+  .portada .antetitulo--marca{order:0}
+  .caja-codigo{order:2;padding:20px;gap:10px}
+  .caja-codigo h2{font-size:20px}
+  .portada .bajada{order:3;margin-top:24px;font-size:17px}
+  .portada .acciones{order:4;margin-top:18px}
+  .portada .cifras{order:5;margin-top:24px}
+  /* Fórmulas del ejemplo un poco más chicas para que quepan */
+  .ejemplo .lineas{font-size:17.5px}
+  .ejemplo ol{padding:4px 16px 16px}
+  .ejemplo .enunciado{padding:16px}
+}
+/* Si una ecuación no cabe, el renglón siguiente se sangra para leerse como continuación */
+.ejemplo .lineas>span{padding-left:1.4em;text-indent:-1.4em}

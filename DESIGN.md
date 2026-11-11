@@ -11,21 +11,21 @@ Todos los valores viven como variables en `estilos.css`; las páginas usan los n
 |---|---|---|
 | `--tinta` | #0e1a2b | Texto principal, títulos |
 | `--tinta-2` | #44546a | Texto secundario, descripciones |
-| `--tinta-3` | #6b7a90 | Notas, metadatos, placeholders |
+| `--tinta-3` | #5b697e | Notas, metadatos, placeholders |
 | `--fondo` | #ffffff | Fondo de página |
 | `--superficie` | #f5f7fa | Bandas alternas, cajas suaves |
 | `--borde` | #e2e7ee | Bordes de tarjetas e inputs |
 | `--marino` | #0f2557 | Marca (azul del logo): textos de marca, pie, chips de código |
 | `--naranja` | #ff6b00 | Marca (naranja del logo): solo formas y resaltados, nunca texto pequeño |
-| `--naranja-texto` | #c24e00 | Texto naranja legible ("AULA", antetítulos de marca) |
+| `--naranja-texto` | #b34700 | Texto naranja legible ("AULA", antetítulos de marca) |
 | `--primario` | #1f4fd1 | Botones principales, enlaces, foco |
 | `--primario-suave` | #e9effd | Fondos de selección, chips de navegación |
-| `--tinto` | #a3303c | Cargas, interactivos y llamadas a "Pruébalo" (convención de clase) |
+| `--tinto` | #a3303c | Solo cargas e interactivos ("Pruébalo", "Abrir interactivo"); nunca para botones de navegación |
 | `--exito` | #1d7a46 | Resultados y respuestas correctas |
 | `--aviso` | #8b1a1a sobre #fbeaea | "Error frecuente" |
 
 Identidad por área (texto / fondo):
-Estructuras #1f4fd1 / #e9effd · Geotecnia #9a6212 / #fbf1de · Hidráulica #0b7a70 / #dcf3ef · Arquitectura #5b3fa6 / #efeafb.
+Estructuras #1f4fd1 / #e9effd · Geotecnia #9a6212 / #fbf1de · Hidráulica #0a7068 / #dcf3ef · Arquitectura #5b3fa6 / #efeafb.
 
 Contraste: todo texto ≥ 4.5:1 sobre su fondo.
 
@@ -64,3 +64,13 @@ Sombras: `--sombra-1` (reposo, casi imperceptible) y `--sombra-2` (al pasar el c
 ## Imágenes e íconos
 
 Íconos de línea propios (trazo 1.8 px, puntas redondeadas). Ilustraciones planas con formas técnicas (puente, edificio, vigas). En diagramas: cargas en tinto, viga gris azulado, cortante en azul, momento en verde con **momento positivo hacia abajo**.
+
+## Reglas de celular y de texto (nov 2026)
+
+- **Portada en celular**: la caja «¿Te dieron un código?» va justo después del título; debe verse sin desplazar.
+- **Barra fija**: los anclajes usan `--alto-barra` (96 px; 128 px en celular) para que ningún título quede tapado.
+- **Menú en celular**: textos cortos («Civil», «Cómo usar») y desvanecido a la derecha si no cabe.
+- **Números**: los miles y la unidad nunca se separan del número (espacio duro: 2 000 kgf). El cero con diagonal de Atkinson es intencional (distingue 0 de O).
+- **Ejemplo resuelto**: una ecuación por renglón; si no cabe, el renglón siguiente va sangrado.
+- **Rejillas de tres tarjetas**: 3 columnas en escritorio, 1 en celular; nunca una tarjeta huérfana.
+- **Vista previa al compartir**: `vista-previa.png` (1200×630) en las etiquetas `og:` de cada página.

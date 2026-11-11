@@ -51,6 +51,12 @@
     });
   }
   var q = document.getElementById('buscar'), res = document.getElementById('resultados');
+  // En celular el buscador es angosto: texto corto para que no se corte
+  if(q && window.matchMedia){
+    var largo = q.placeholder, mq = window.matchMedia('(max-width:640px)');
+    var ajustar = function(){ q.placeholder = mq.matches ? 'Tema o código' : largo; };
+    ajustar(); if(mq.addEventListener) mq.addEventListener('change', ajustar);
+  }
   if(q && res){
     function pintar(){
       var v = norm(q.value.trim()); res.innerHTML = '';
