@@ -74,3 +74,8 @@ Sombras: `--sombra-1` (reposo, casi imperceptible) y `--sombra-2` (al pasar el c
 - **Ejemplo resuelto**: una ecuación por renglón; si no cabe, el renglón siguiente va sangrado.
 - **Rejillas de tres tarjetas**: 3 columnas en escritorio, 1 en celular; nunca una tarjeta huérfana.
 - **Vista previa al compartir**: `vista-previa.png` (1200×630) en las etiquetas `og:` de cada página.
+
+## Ilustraciones de carrera y materias de suelos (nov 2026)
+
+- **Ilustraciones de carrera**: plano técnico en elevación 2D, con el mismo lenguaje que las franjas de materia: fondo suave del área, cuadrícula de 16/80 px, franja superior de color, dibujo a línea, cargas en tinto, cotas en píldora blanca y cajetín de plano.
+- **Mecánica de suelos (MS)**: pesos específicos en t/m³ (= g/cm³) y esfuerzos en t/m², con equivalencia en kgf/cm² en los resultados. Las capas de suelo van en café de geotecnia, el agua en verde agua de hidráulica y las cargas en tinto.
