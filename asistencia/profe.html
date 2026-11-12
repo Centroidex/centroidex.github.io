@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Pase de lista · Docente</title>
+<title>Pase de lista</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="profe.webmanifest">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="icon" type="image/png" href="icono-192.png">
 <link rel="stylesheet" href="estilos.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 </head>
@@ -15,12 +19,10 @@
 
 <!-- ================= LOGIN ================= -->
 <main id="vLogin" class="wrap">
-  <header class="top">
-    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <div><p class="marca">PANEL <b>DOCENTE</b></p><h1>Pase de lista</h1><p class="sub">Entra con tu PIN</p></div>
-  </header>
+  <header class="cab"><b>Asistencia</b><span>Panel docente</span></header>
+  <h1>Entra con tu PIN</h1>
   <section class="card">
-    <label for="inPin" style="margin-top:0">PIN</label>
+    <label for="inPin">PIN</label>
     <input id="inPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••">
     <label class="check"><input type="checkbox" id="chkRecordar" checked> Recordar en este dispositivo</label>
     <button id="btnEntrar" class="btn">Entrar</button>
@@ -30,17 +32,12 @@
 
 <!-- ================= PANEL ================= -->
 <main id="vPanel" class="wrap ancho oculto">
-  <header class="top">
-    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <div><p class="marca">PANEL <b>DOCENTE</b></p><h1>Pase de lista</h1></div>
-  </header>
+  <header class="cab"><b>Asistencia</b><button id="btnSalir" class="link salir">Cerrar sesión</button></header>
 
   <nav class="tabs">
     <button class="tab activo" data-t="tLista">Pase de lista</button>
     <button class="tab" data-t="tReportes">Reportes</button>
     <button class="tab" data-t="tPlanteles">Planteles</button>
-    <span class="esp"></span>
-    <button id="btnSalir" class="link">Cerrar sesión</button>
   </nav>
 
   <p id="errPanel" class="error oculto"></p>
@@ -61,6 +58,16 @@
         <select id="selInt">
           <option value="20">Cada 20 s (proyector)</option>
           <option value="45">Cada 45 s (celular)</option>
+        </select>
+      </div>
+      <div>
+        <label for="selVentana">Tiempo para registrarse</label>
+        <select id="selVentana">
+          <option value="10">10 minutos</option>
+          <option value="15">15 minutos</option>
+          <option value="20" selected>20 minutos</option>
+          <option value="30">30 minutos</option>
+          <option value="0">Sin límite</option>
         </select>
       </div>
     </div>
@@ -85,7 +92,7 @@
       <button class="btn sec chico" data-r="mes">Este mes</button>
       <button class="btn sec chico" data-r="todo">Todo el ciclo</button>
       <button class="btn chico" id="btnRep">Consultar</button>
-      <button class="btn chico oculto" id="btnCsv" style="background:var(--exito)">Descargar Excel</button>
+      <button class="btn chico verde oculto" id="btnCsv">Descargar Excel</button>
     </div>
     <div id="repSalida"></div>
   </section>
@@ -100,46 +107,87 @@
 </main>
 
 <!-- ================= PASE DE LISTA EN CURSO ================= -->
-<main id="vSesion" class="wrap ancho sesion oculto">
-  <div class="ses-top">
-    <div class="marca-fila">
-      <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-      <div><h1 id="sTitulo"></h1><p class="sub" id="sSub"></p></div>
-    </div>
-    <div class="botones" style="margin:0">
+<main id="vSesion" class="proy oculto">
+  <div class="proy-izq">
+    <p class="ind">Escanea el código con tu celular</p>
+    <div class="qr"><img id="qr" alt="Código QR de asistencia"></div>
+    <p class="cod" id="sCodigo"></p>
+    <div class="bar"><i id="sBarra"></i></div>
+    <small id="sEstado"></small>
+    <div class="proy-acc">
       <button class="btn sec chico" id="btnFull">Pantalla completa</button>
       <button class="btn sec chico" id="btnVolver">Volver al panel</button>
       <button class="btn peligro chico" id="btnCerrar">Cerrar y marcar faltas</button>
     </div>
   </div>
-
-  <div class="ses-cuerpo">
-    <section class="card qrbox">
-      <div class="qrmarco"><img id="qr" alt="Código QR de asistencia"></div>
-      <p class="etiqueta-qr">Escanea el QR con tu celular</p>
-      <p class="codigo-grande" id="sCodigo" style="margin-bottom:12px">— — —</p>
-      <div class="tiempo"><div id="sBarra"></div></div>
-      <p class="mini" id="sEstado"></p>
-    </section>
-
-    <section class="card">
-      <p class="contador"><span id="sCuenta">0</span> <small>de <span id="sTotal">0</span> ya están</small></p>
-      <p class="mini" id="sDetalle"></p>
-      <ul class="lista" id="sLista"></ul>
-      <p class="mini" id="sRechazos"></p>
-    </section>
+  <div class="proy-der">
+    <div class="proy-cab">
+      <div><h1 id="sTitulo"></h1><p id="sSub"></p></div>
+      <div class="num">
+        <b><span id="sCuenta">0</span><span class="de"> de <span id="sTotal">0</span></span></b>
+        <div class="cierre" id="sCierreBox"><span id="sCierre"></span><button class="btn sec chico" id="btnMas">+5 min</button></div>
+      </div>
+    </div>
+    <div class="lista2" id="sLista"></div>
+    <div class="proy-pie"><span id="sDetalle"></span><span class="aviso" id="sRechazos"></span></div>
   </div>
 </main>
+
+<dialog id="dlg" class="dlg">
+  <h2 id="dlgT"></h2>
+  <p id="dlgX"></p>
+  <div id="dlgB" class="dlg-botones"></div>
+</dialog>
 
 <script src="comun.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-let PIN = null, DATOS = null, SES = null, codigoActual = '', finVentana = 0, ultimo = 0, ocupado = false, timer = null, wake = null, REP = null;
+let PIN = null, DATOS = null, SES = null, codigoActual = '', finVentana = 0, finRegistro = null, ultimo = 0, ocupado = false, timer = null, wake = null, REP = null, ULT = null;
 const URL_ALUMNO = new URL('./', location.href).href;
 
 function vista(id) { ['vLogin', 'vPanel', 'vSesion'].forEach(v => $(v).classList.toggle('oculto', v !== id)); }
 function err(id, m) { $(id).textContent = m || ''; $(id).classList.toggle('oculto', !m); }
 const llamar = (accion, datos) => api(accion, Object.assign({ pin: PIN }, datos || {}));
+
+/* ---------- Diálogos propios (en lugar de las ventanas del navegador) ---------- */
+function dialogo(titulo, texto, botones) {
+  return new Promise(res => {
+    const d = $('dlg');
+    $('dlgT').textContent = titulo;
+    $('dlgX').textContent = texto || ''; $('dlgX').classList.toggle('oculto', !texto);
+    $('dlgB').innerHTML = '';
+    botones.forEach(b => {
+      const el = document.createElement('button');
+      el.className = b.clase === 'link' ? 'link' : 'btn ' + (b.clase || '');
+      el.textContent = b.t;
+      el.onclick = () => { d.close(); res(b.v); };
+      $('dlgB').appendChild(el);
+    });
+    d.oncancel = () => res(null);
+    d.showModal();
+  });
+}
+const aviso = (titulo, texto) => dialogo(titulo, texto, [{ t: 'Entendido', v: true }]);
+
+// Marcar o corregir a mano el estado de un alumno en una clase
+async function corregir(sesionId, mat, nombre, actual, cuando) {
+  const v = await dialogo(nombreBonito(nombre), [cuando, actual ? 'Ahora: ' + actual.toLowerCase() : 'Aún sin registro'].filter(Boolean).join('. ') + '.', [
+    { t: 'Asistencia', v: 'Asistencia', clase: 'op A' }, { t: 'Retardo', v: 'Retardo', clase: 'op R' },
+    { t: 'Falta', v: 'Falta', clase: 'op F' }, { t: 'Justificada', v: 'Justificada', clase: 'op J' },
+    { t: 'Cancelar', v: null, clase: 'sec' }, { t: 'Liberar su celular', v: 'liberar', clase: 'link' }
+  ]);
+  if (!v) return false;
+  try {
+    if (v === 'liberar') {
+      const r = await llamar('liberarCelular', { matricula: mat });
+      await aviso(r.liberados ? 'Celular liberado' : 'Sin celular vinculado',
+        r.liberados ? 'La próxima vez que se registre quedará vinculado su celular nuevo.' : 'Este alumno todavía no tiene ningún celular vinculado.');
+      return false;
+    }
+    await llamar('marcar', { sesionId: sesionId, matricula: mat, estado: v });
+    return true;
+  } catch (e) { await aviso('No se pudo guardar', e.message); return false; }
+}
 
 /* ---------- Login ---------- */
 async function entrar(pin, recordar) {
@@ -176,7 +224,7 @@ function opcionesGrupos(sel) {
   DATOS.grupos.forEach(g => (porPlantel[g.plantel || 'Sin plantel'] = porPlantel[g.plantel || 'Sin plantel'] || []).push(g));
   sel.innerHTML = Object.keys(porPlantel).map(p =>
     '<optgroup label="' + esc(p) + '">' + porPlantel[p].map(g =>
-      '<option value="' + esc(g.clave) + '">' + esc(g.grupo) + (g.materia ? ' · ' + esc(g.materia) : '') + '</option>').join('') + '</optgroup>').join('');
+      '<option value="' + esc(g.clave) + '">' + (g.materia ? esc(g.materia) + ', ' : '') + esc(g.grupo) + '</option>').join('') + '</optgroup>').join('');
   if (previo) sel.value = previo;
 }
 
@@ -192,7 +240,7 @@ function pintarPanel() {
 
   $('abiertas').innerHTML = DATOS.abiertas.length
     ? '<h2>Pases de lista abiertos</h2>' + DATOS.abiertas.map(s =>
-        '<div class="abierta"><div><strong>' + esc(s.grupo) + '</strong><br><span class="mini">' + esc(s.materia) + ' · ' + s.fecha + ' ' + s.inicio +
+        '<div class="abierta"><div><strong>' + esc(s.materia || s.grupo) + '</strong><br><span class="mini">Grupo ' + esc(s.grupo) + ', ' + fechaTexto(s.fecha) + ', ' + s.inicio +
         '</span></div><button class="btn chico" data-id="' + s.id + '">Reanudar</button></div>').join('') + '<hr class="separador">'
     : '';
   $('abiertas').querySelectorAll('button[data-id]').forEach(b => b.onclick = () => abrirVista(DATOS.abiertas.find(s => s.id === b.dataset.id)));
@@ -206,7 +254,7 @@ function actualizarRef() {
   $('txtRef').textContent = $('chkUbic').checked
     ? 'Se usará la ubicación de este dispositivo como centro (requiere precisión de ±60 m o mejor; si no, se usa la del plantel).'
     : (p && p.lat !== null ? 'Se verificará contra la ubicación guardada del plantel (radio ' + p.radio + ' m).'
-                           : '⚠ Este plantel aún no tiene ubicación guardada: activa la casilla o fíjala en la pestaña Planteles.');
+                           : 'Este plantel aún no tiene ubicación guardada: activa la casilla o fíjala en la pestaña Planteles.');
 }
 $('selGrupo').onchange = actualizarRef;
 $('chkUbic').onchange = actualizarRef;
@@ -221,7 +269,7 @@ $('btnIniciar').onclick = async () => {
       try { u = await mejorUbicacion(15000, 25); } catch (e) { u = {}; }
     }
     b.textContent = 'Iniciando…';
-    const r = await llamar('abrirSesion', Object.assign({ clave: $('selGrupo').value, inicio: $('inInicio').value, intervalo: $('selInt').value }, u));
+    const r = await llamar('abrirSesion', Object.assign({ clave: $('selGrupo').value, inicio: $('inInicio').value, intervalo: $('selInt').value, ventana: $('selVentana').value }, u));
     abrirVista(r.sesion);
   } catch (e) {
     err('errPanel', e.message);
@@ -231,29 +279,45 @@ $('btnIniciar').onclick = async () => {
 };
 
 /* ---------- Pase de lista en curso ---------- */
+const DIAS_L = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MESES_L = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function fechaTexto(f) { const d = new Date(f + 'T12:00:00'); return isNaN(d) ? f : DIAS_L[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES_L[d.getMonth()]; }
+function codigoTexto(t) { $('sCodigo').textContent = t; $('sCodigo').classList.add('texto'); $('qr').removeAttribute('src'); }
+
 async function abrirVista(s) {
-  SES = s; codigoActual = ''; finVentana = 0;
-  $('sTitulo').textContent = s.grupo;
-  $('sSub').textContent = [s.materia, s.plantel, 'Inicio ' + s.inicio, s.referencia].filter(Boolean).join(' · ');
-  $('sLista').innerHTML = ''; $('sCodigo').textContent = '— — —'; $('qr').removeAttribute('src');
+  SES = s; codigoActual = ''; finVentana = 0; finRegistro = null; ULT = null;
+  $('sTitulo').textContent = s.materia || s.grupo;
+  $('sSub').textContent = 'Grupo ' + s.grupo + ', ' + fechaTexto(s.fecha);
+  $('sLista').innerHTML = ''; $('sCodigo').textContent = ''; $('qr').removeAttribute('src'); $('sEstado').textContent = '';
+  $('btnCerrar').classList.remove('oculto'); $('sCierreBox').classList.remove('oculto');
   vista('vSesion');
   try { wake = await navigator.wakeLock.request('screen'); } catch (e) {}
   await refrescar();
-  clearInterval(timer); timer = setInterval(tick, 500);
+  clearInterval(timer);
+  if (ULT && ULT.abierta) timer = setInterval(tick, 500);
 }
 
 async function refrescar() {
   try {
     const r = await llamar('estadoSesion', { sesionId: SES.id });
-    if (!r.abierta) { $('sEstado').textContent = 'Este pase de lista ya está cerrado.'; $('sCodigo').textContent = 'Cerrado'; $('qr').removeAttribute('src'); clearInterval(timer); }
-    else {
+    ULT = r;
+    finRegistro = r.sesion.cierraEn === null ? null : Date.now() + r.sesion.cierraEn * 1000;
+    if (!r.abierta) {
+      clearInterval(timer);
+      codigoTexto('Registro cerrado'); $('sBarra').style.width = '0%';
+      $('sEstado').textContent = r.autoCierre ? 'Se acabó el tiempo. Se marcaron las faltas.' : 'Aún puedes corregir a mano tocando un nombre.';
+      $('btnCerrar').classList.add('oculto'); $('sCierreBox').classList.add('oculto');
+    } else if (!r.codigo) {
+      codigoTexto('Cerrando');
+      $('sEstado').textContent = 'Terminan quienes ya habían escaneado.';
+      finVentana = Date.now() + 5000;
+    } else {
       if (r.codigo !== codigoActual) { codigoActual = r.codigo; pintarQR(r.codigo); }
       finVentana = Date.now() + r.restante * 1000;
-      $('sEstado').textContent = 'El código cambia cada ' + SES.intervalo + ' s';
     }
     pintarLista(r);
   } catch (e) {
-    $('sEstado').textContent = 'Reconectando… (' + e.message + ')';
+    $('sEstado').textContent = 'Sin conexión, reintentando. ' + e.message;
     finVentana = Date.now() + 3000;
   }
   ultimo = Date.now();
@@ -262,6 +326,14 @@ async function refrescar() {
 async function tick() {
   const rest = Math.max(0, (finVentana - Date.now()) / 1000);
   $('sBarra').style.width = Math.min(100, rest / SES.intervalo * 100) + '%';
+  if (ULT && ULT.abierta && ULT.codigo) $('sEstado').textContent = 'El código cambia en ' + Math.ceil(rest) + ' s';
+  if (finRegistro === null) { $('sCierre').textContent = 'Sin límite de tiempo'; $('btnMas').classList.add('oculto'); }
+  else {
+    const q = Math.max(0, Math.round((finRegistro - Date.now()) / 1000));
+    $('sCierre').textContent = q ? 'El registro cierra en ' + Math.floor(q / 60) + ':' + pad2(q % 60) : 'Cerrando';
+    $('sCierreBox').classList.toggle('pronto', q > 0 && q <= 120);
+    $('btnMas').classList.remove('oculto');
+  }
   if (!ocupado && (rest <= 0.2 || Date.now() - ultimo > 5000)) { ocupado = true; await refrescar(); ocupado = false; }
 }
 
@@ -269,35 +341,77 @@ function pintarQR(c) {
   const qr = qrcode(0, 'M');
   qr.addData(URL_ALUMNO + '?c=' + c);
   qr.make();
-  $('qr').src = qr.createDataURL(10, 2);
+  $('qr').src = qr.createDataURL(10, 0);
+  $('sCodigo').classList.remove('texto');
   $('sCodigo').textContent = c.slice(0, 3) + ' ' + c.slice(3);
 }
 
+// La proyección es la lista completa del grupo, que se va llenando
 function pintarLista(r) {
-  const presentes = r.registros.filter(x => x.estado !== 'Falta');
-  const nA = presentes.filter(x => x.estado === 'Asistencia').length;
-  $('sCuenta').textContent = presentes.length;
+  const cuenta = k => r.registros.filter(x => x.estado === k).length;
+  const nA = cuenta('Asistencia'), nR = cuenta('Retardo'), nJ = cuenta('Justificada'), nF = cuenta('Falta');
+  $('sCuenta').textContent = nA + nR;
   $('sTotal').textContent = r.total;
-  $('sDetalle').textContent = nA + ' a tiempo · ' + (presentes.length - nA) + ' con retardo';
-  const ord = r.registros.slice().reverse();
-  $('sLista').innerHTML = ord.map(x => {
-    const k = x.estado === 'Asistencia' ? 'A' : x.estado === 'Retardo' ? 'R' : 'F';
-    return '<li><span>' + esc(x.nombre) + (x.obs ? '<span class="obs">⚠ ' + esc(x.obs) + '</span>' : '') + '</span>' +
-           '<span><span class="mini">' + esc(x.hora) + '</span> <span class="tag ' + k + '">' + esc(x.estado) + '</span></span></li>';
-  }).join('');
-  $('sRechazos').textContent = r.rechazados.length ? '⚠ ' + r.rechazados.length + ' intento(s) rechazado(s) — detalle en la hoja "Intentos".' : '';
-}
+  const partes = [nA + ' a tiempo', nR + ' con retardo'];
+  if (nF) partes.push(nF === 1 ? '1 falta' : nF + ' faltas');
+  if (nJ) partes.push(nJ === 1 ? '1 justificada' : nJ + ' justificadas');
+  $('sDetalle').textContent = partes.join(', ') + '. Toca un nombre para marcarlo o corregirlo.';
 
-$('btnVolver').onclick = () => { clearInterval(timer); if (wake) wake.release().catch(() => {}); vista('vPanel'); recargar(); };
+  const filas = r.registros.map(x => ({ m: x.matricula, n: x.nombre, e: x.estado, h: x.hora, obs: x.obs }))
+    .concat((r.pendientes || []).map(a => ({ m: a.id, n: a.nombre, e: '' })))
+    .sort((a, b) => a.n.localeCompare(b.n, 'es'));
+  const ult = r.abierta ? r.registros.filter(x => x.estado === 'Asistencia' || x.estado === 'Retardo').slice(-1)[0] : null;
+  const ancho = !matchMedia('(max-width: 820px)').matches;
+  const cols = !ancho ? 1 : filas.length > 46 ? 3 : filas.length > 8 ? 2 : 1;
+  const porCol = Math.max(1, Math.ceil(filas.length / cols));
+  const el = $('sLista');
+  const alto = ancho ? Math.max(20, Math.min(40, Math.floor((el.clientHeight - 4) / porCol))) : 44;
+  el.style.gridTemplateRows = 'repeat(' + porCol + ', ' + alto + 'px)';
+  el.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+  const letra = Math.max(12, Math.min(17, alto * 0.5));
+  el.innerHTML = filas.map((x, i) => {
+    const k = x.e ? claseEstado(x.e) : 'no';
+    const marca = k === 'A' ? esc(x.h) : k === 'R' ? 'R ' + esc(x.h || '') : k === 'F' ? 'Falta' : k === 'J' ? 'Justif.' : '';
+    const revisar = x.obs && /Celular nuevo/.test(x.obs) ? '<em>celular nuevo</em>' : '';
+    return '<div class="r ' + k + (ult && ult.matricula === x.m ? ' nuevo' : '') + '" data-m="' + esc(x.m) + '" style="height:' + alto + 'px;font-size:' + letra + 'px">' +
+      '<i>' + (i + 1) + '</i><span>' + esc(nombreBonito(x.n)) + revisar + '</span><b>' + marca + '</b></div>';
+  }).join('');
+  const n = r.rechazados.length;
+  $('sRechazos').textContent = n ? (n === 1 ? '1 intento rechazado' : n + ' intentos rechazados') + ' (detalle en la hoja Intentos)' : '';
+}
+addEventListener('resize', () => { if (ULT && !$('vSesion').classList.contains('oculto')) pintarLista(ULT); });
+
+async function tocarAlumno(e) {
+  const li = e.target.closest('[data-m]');
+  if (!li || !ULT) return;
+  const m = li.dataset.m;
+  const reg = ULT.registros.find(x => x.matricula === m), pen = (ULT.pendientes || []).find(x => x.id === m);
+  if (await corregir(SES.id, m, reg ? reg.nombre : pen.nombre, reg ? reg.estado : '', '')) refrescar();
+}
+$('sLista').onclick = tocarAlumno;
+
+$('btnMas').onclick = async () => {
+  $('btnMas').disabled = true;
+  try { await llamar('extender', { sesionId: SES.id, minutos: 5 }); await refrescar(); }
+  catch (e) { await aviso('No se pudo dar más tiempo', e.message); }
+  finally { $('btnMas').disabled = false; }
+};
+
+function salirDeSesion() { clearInterval(timer); if (wake) wake.release().catch(() => {}); vista('vPanel'); recargar(); }
+$('btnVolver').onclick = salirDeSesion;
 $('btnFull').onclick = () => { const d = document.documentElement; if (!document.fullscreenElement) (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d); else document.exitFullscreen(); };
 $('btnCerrar').onclick = async () => {
-  if (!confirm('¿Cerrar el pase de lista?\n\nLos alumnos que no se registraron quedarán con FALTA y ya nadie podrá registrarse.')) return;
+  const n = ULT && ULT.pendientes ? ULT.pendientes.length : 0;
+  const ok = await dialogo('¿Cerrar el pase de lista?',
+    (n ? (n === 1 ? 'El alumno que falta quedará' : 'Los ' + n + ' alumnos que faltan quedarán') + ' con falta' : 'Ya se registraron todos') + ' y nadie más podrá registrarse. Después puedes corregir a mano.',
+    [{ t: 'Cerrar y marcar faltas', v: true, clase: 'peligro' }, { t: 'Seguir abierto', v: null, clase: 'sec' }]);
+  if (!ok) return;
   try {
     const r = await llamar('cerrarSesion', { sesionId: SES.id });
-    clearInterval(timer); if (wake) wake.release().catch(() => {});
-    alert('Pase de lista cerrado. Faltas registradas: ' + r.faltas);
-    vista('vPanel'); recargar();
-  } catch (e) { alert(e.message); }
+    clearInterval(timer);
+    await aviso('Pase de lista cerrado', r.faltas === 1 ? 'Se registró 1 falta.' : 'Se registraron ' + r.faltas + ' faltas.');
+    salirDeSesion();
+  } catch (e) { await aviso('No se pudo cerrar', e.message); }
 };
 
 /* ---------- Reportes ---------- */
@@ -329,7 +443,7 @@ function nombreBonito(n) {
   return String(n || '').toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase())
     .replace(/\b(De|Del|La|Las|Los|Y)\b/g, w => w.toLowerCase());
 }
-function claseEstado(e) { return e === 'Asistencia' ? 'A' : e === 'Retardo' ? 'R' : e === 'Falta' ? 'F' : (e ? 'O' : 'P'); }
+function claseEstado(e) { return e === 'Asistencia' ? 'A' : e === 'Retardo' ? 'R' : e === 'Falta' ? 'F' : e === 'Justificada' ? 'J' : (e ? 'O' : 'P'); }
 function pl(n, uno, varios) { return n + ' ' + (n === 1 ? uno : varios); }
 function nivel(p, min) { return p === null ? 'nd' : p < min ? 'bajo' : p < min + 10 ? 'medio' : 'bien'; }
 let VISTA = 'alumno', ORDEN = 'nombre';
@@ -344,8 +458,8 @@ function pintarReporte() {
   let h = '<div class="resumen">' +
     '<div class="dato"><span>Clases</span><b>' + r.sesiones.length + '</b></div>' +
     '<div class="dato"><span>Alumnos</span><b>' + r.alumnos.length + '</b></div>' +
-    '<div class="dato"><span>Promedio</span><b>' + (prom === null ? '—' : prom + '%') + '</b></div>' +
-    '<div class="dato ' + (enRiesgo ? 'alerta' : '') + '"><span>Bajo ' + min + '%</span><b>' + enRiesgo + '</b></div></div>';
+    '<div class="dato"><span>Promedio</span><b>' + (prom === null ? '—' : prom + ' %') + '</b></div>' +
+    '<div class="dato ' + (enRiesgo ? 'alerta' : '') + '"><span>Bajo ' + min + ' %</span><b>' + enRiesgo + '</b></div></div>';
 
   h += '<div class="vista-barra"><div class="segmento">' +
     '<button data-v="alumno" class="' + (VISTA === 'alumno' ? 'activo' : '') + '">Por alumno</button>' +
@@ -360,37 +474,45 @@ function pintarReporte() {
       const nv = nivel(a.pct, min);
       return '<li class="rep-alumno">' +
         '<div class="rep-cab"><div class="rep-nombre">' + esc(nombreBonito(a.nombre)) +
-        '<div class="rep-cuentas"><span class="c-A">' + pl(a.A, 'asistencia', 'asistencias') + '</span><span class="c-R">' + pl(a.R, 'retardo', 'retardos') + '</span><span class="c-F">' + pl(a.F, 'falta', 'faltas') + '</span></div></div>' +
-        '<div class="pct ' + nv + '">' + (a.pct === null ? '—' : Math.round(a.pct) + '%') + '</div></div>' +
+        '<div class="rep-cuentas"><span class="c-A">' + pl(a.A, 'asistencia', 'asistencias') + '</span><span class="c-R">' + pl(a.R, 'retardo', 'retardos') + '</span><span class="c-F">' + pl(a.F, 'falta', 'faltas') + '</span>' + (a.J ? '<span class="c-J">' + pl(a.J, 'justificada', 'justificadas') + '</span>' : '') + '</div></div>' +
+        '<div class="pct ' + nv + '">' + (a.pct === null ? '—' : Math.round(a.pct) + ' %') + '</div></div>' +
         '<div class="historial">' + a.estados.map((e, i) => {
           const s = r.sesiones[i];
-          return '<span class="punto-h ' + claseEstado(e) + '" title="' + fechaCorta(s.fecha) + ' ' + s.hora + ' · ' + (e || 'sin registro') + '"></span>';
+          const t = fechaCorta(s.fecha) + ' ' + s.hora + ', ' + (e || 'sin registro').toLowerCase();
+          return '<button class="punto-h ' + claseEstado(e) + '" data-i="' + i + '" data-m="' + esc(a.matricula) + '" title="' + t + '" aria-label="' + t + '"></button>';
         }).join('') + '</div></li>';
     }).join('') + '</ul>';
-    h += '<p class="leyenda"><span class="punto-h A"></span> asistencia <span class="punto-h R"></span> retardo <span class="punto-h F"></span> falta <span class="punto-h P"></span> sin registro · cada cuadro es una clase, de la más antigua a la más reciente. El % cuenta asistencias + retardos.</p>';
+    h += '<p class="leyenda">Cada casilla es una clase, de la más antigua a la más reciente: <span class="pt"></span> asistencia, <b class="c-R">R</b> retardo, <b class="c-F">F</b> falta, <b class="c-J">J</b> justificada. Toca una casilla para corregirla. Las justificadas no cuentan para el porcentaje.</p>';
   } else {
     h += '<ul class="rep-lista">' + r.sesiones.slice().reverse().map(s => {
       const i = r.sesiones.indexOf(s);
-      const est = r.alumnos.map(a => ({ n: a.nombre, e: a.estados[i] }));
+      const est = r.alumnos.map(a => ({ n: a.nombre, m: a.matricula, e: a.estados[i] }));
       const c = k => est.filter(x => claseEstado(x.e) === k);
-      const A = c('A'), R = c('R'), F = c('F'), tot = r.alumnos.length || 1;
+      const A = c('A'), R = c('R'), F = c('F'), J = c('J'), tot = (r.alumnos.length - J.length) || 1;
       const pres = Math.round((A.length + R.length) / tot * 100);
-      const nombres = (arr) => arr.map(x => esc(nombreBonito(x.n))).join(', ');
+      const nombres = (arr) => arr.map(x => '<button class="nom" data-i="' + i + '" data-m="' + esc(x.m) + '">' + esc(nombreBonito(x.n)) + '</button>').join(', ');
       return '<li class="rep-clase"><details><summary>' +
-        '<div class="rep-cab"><div class="rep-nombre">' + fechaLarga(s.fecha) + ' · ' + s.hora + (s.abierta ? ' <span class="tag R">abierto</span>' : '') +
+        '<div class="rep-cab"><div class="rep-nombre">' + fechaLarga(s.fecha) + ', ' + s.hora + (s.abierta ? ' <span class="tag R">abierto</span>' : '') +
         '<div class="rep-cuentas"><span class="c-A">' + pl(A.length, 'asistencia', 'asistencias') + '</span><span class="c-R">' + pl(R.length, 'retardo', 'retardos') + '</span><span class="c-F">' + pl(F.length, 'falta', 'faltas') + '</span></div></div>' +
-        '<div class="pct ' + nivel(pres, min) + '">' + pres + '%</div></div>' +
+        '<div class="pct ' + nivel(pres, min) + '">' + pres + ' %</div></div>' +
         '<div class="barra-clase"><i class="A" style="width:' + (A.length / tot * 100) + '%"></i><i class="R" style="width:' + (R.length / tot * 100) + '%"></i><i class="F" style="width:' + (F.length / tot * 100) + '%"></i></div>' +
         '</summary><div class="detalle-clase">' +
         (F.length ? '<p><b class="c-F">Faltaron:</b> ' + nombres(F) + '</p>' : '<p class="c-A"><b>Sin faltas</b></p>') +
         (R.length ? '<p><b class="c-R">Con retardo:</b> ' + nombres(R) + '</p>' : '') +
+        (J.length ? '<p><b class="c-J">Justificadas:</b> ' + nombres(J) + '</p>' : '') +
         '</div></details></li>';
-    }).join('') + '</ul><p class="leyenda">Toca una clase para ver quién faltó o llegó tarde.</p>';
+    }).join('') + '</ul><p class="leyenda">Toca una clase para ver quién faltó o llegó tarde, y un nombre para corregirlo.</p>';
   }
 
   $('repSalida').innerHTML = h;
   $('btnCsv').classList.remove('oculto');
   $('repSalida').querySelectorAll('[data-v]').forEach(b => b.onclick = () => { VISTA = b.dataset.v; pintarReporte(); });
+  $('repSalida').onclick = async e => {
+    const b = e.target.closest('[data-m]');
+    if (!b) return;
+    const s = REP.sesiones[+b.dataset.i], a = REP.alumnos.find(x => x.matricula === b.dataset.m);
+    if (await corregir(s.id, a.matricula, a.nombre, a.estados[+b.dataset.i], fechaLarga(s.fecha) + ', ' + s.hora)) consultar();
+  };
   if ($('repOrden')) { $('repOrden').value = ORDEN; $('repOrden').onchange = e => { ORDEN = e.target.value; pintarReporte(); }; }
 }
 
@@ -414,7 +536,7 @@ $('btnCsv').onclick = async () => {
   try {
     await cargarScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
     await exportarExcel();
-  } catch (e) { alert(e.message); }
+  } catch (e) { await aviso('No se pudo generar el Excel', e.message); }
   finally { b.disabled = false; b.textContent = txt; }
 };
 
@@ -429,9 +551,9 @@ async function exportarExcel() {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Pase de lista';
   const ws = wb.addWorksheet('Asistencia', { views: [{ state: 'frozen', xSplit: 2, ySplit: 7 }], pageSetup: { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
-  const nCols = 2 + r.sesiones.length + 4;
+  const nCols = 2 + r.sesiones.length + 5;
   const MARINO = 'FF0F2557', GRIS = 'FFF5F7FA', BORDE = 'FFE2E7EE';
-  const color = { Asistencia: ['FFE3F4EA', 'FF1D7A46'], Retardo: ['FFFBF1DE', 'FF9A6212'], Falta: ['FFFBEAEA', 'FF8B1A1A'] };
+  const color = { Asistencia: ['FFE3F4EA', 'FF1D7A46'], Retardo: ['FFFBF1DE', 'FF9A6212'], Falta: ['FFFBEAEA', 'FF8B1A1A'], Justificada: ['FFE9EFFD', 'FF1F4FD1'] };
   const borde = { top: { style: 'thin', color: { argb: BORDE } }, left: { style: 'thin', color: { argb: BORDE } }, bottom: { style: 'thin', color: { argb: BORDE } }, right: { style: 'thin', color: { argb: BORDE } } };
 
   ws.mergeCells(1, 1, 1, nCols);
@@ -448,7 +570,7 @@ async function exportarExcel() {
   const enc = ['No.', 'Alumno'].concat(r.sesiones.map(s => {
     const d = new Date(s.fecha + 'T12:00:00');
     return dias[d.getDay()] + ' ' + s.fecha.slice(8, 10) + '/' + s.fecha.slice(5, 7) + (repetidas[s.fecha] > 1 ? ' ' + s.hora : '');
-  }), ['Asistencias', 'Retardos', 'Faltas', '% Asistencia']);
+  }), ['Asistencias', 'Retardos', 'Faltas', 'Justificadas', '% Asistencia']);
   const fe = ws.getRow(7);
   enc.forEach((v, i) => {
     const c = fe.getCell(i + 1); c.value = v;
@@ -461,7 +583,7 @@ async function exportarExcel() {
 
   r.alumnos.forEach((a, k) => {
     const fila = ws.getRow(8 + k);
-    const vals = [k + 1, nombreBonito(a.nombre)].concat(a.estados.map(e => e || 'Sin registro'), [a.A, a.R, a.F, a.pct === null ? null : a.pct / 100]);
+    const vals = [k + 1, nombreBonito(a.nombre)].concat(a.estados.map(e => e || 'Sin registro'), [a.A, a.R, a.F, a.J || 0, a.pct === null ? null : a.pct / 100]);
     vals.forEach((v, i) => {
       const c = fila.getCell(i + 1); c.value = v; c.border = borde;
       c.alignment = { horizontal: i === 1 ? 'left' : 'center', vertical: 'middle' };
@@ -478,7 +600,7 @@ async function exportarExcel() {
   });
 
   const fin = 8 + r.alumnos.length + 1;
-  ws.getCell(fin, 2).value = 'El % considera asistencias + retardos sobre las clases registradas. Mínimo requerido: ' + min + '%.';
+  ws.getCell(fin, 2).value = 'El % considera asistencias + retardos sobre las clases registradas; las faltas justificadas no cuentan. Mínimo requerido: ' + min + '%.';
   ws.getCell(fin, 2).font = { italic: true, size: 9, color: { argb: 'FF6B7A90' } };
 
   ws.getColumn(1).width = 5;
@@ -502,8 +624,8 @@ function pintarPlanteles() {
   $('listaPlanteles').innerHTML = DATOS.planteles.map((p, i) =>
     '<div class="plantel"><strong>' + esc(p.plantel) + '</strong><br>' +
     (p.lat !== null
-      ? '<span class="mini">Ubicación guardada · <a target="_blank" rel="noopener" href="https://maps.google.com/?q=' + p.lat + ',' + p.lng + '">ver en mapa</a></span>'
-      : '<span class="mini" style="color:var(--mal)">Sin ubicación guardada</span>') +
+      ? '<span class="mini">Ubicación guardada, <a target="_blank" rel="noopener" href="https://maps.google.com/?q=' + p.lat + ',' + p.lng + '">ver en mapa</a></span>'
+      : '<span class="mini c-F">Sin ubicación guardada</span>') +
     '<div class="fila" style="align-items:end"><div><label>Radio permitido (m)</label><input type="number" min="50" max="1000" value="' + p.radio + '" id="rad' + i + '"></div>' +
     '<div><button class="btn sec" data-i="' + i + '" style="margin-top:0">Fijar ubicación aquí</button></div></div>' +
     '<p class="mini" id="pm' + i + '"></p></div>').join('');
@@ -513,7 +635,7 @@ function pintarPlanteles() {
     try {
       const u = await mejorUbicacion(20000, 20);
       await llamar('fijarUbicacion', Object.assign({ plantel: p.plantel, radio: $('rad' + i).value }, u));
-      $('pm' + i).textContent = '✓ Guardada (precisión ±' + Math.round(u.acc) + ' m)';
+      $('pm' + i).textContent = 'Ubicación guardada (precisión ±' + Math.round(u.acc) + ' m)';
       await recargar();
     } catch (e) { $('pm' + i).textContent = e.message; }
     finally { b.disabled = false; }

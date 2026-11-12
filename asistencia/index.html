@@ -4,70 +4,89 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Registro de asistencia</title>
+<title>Asistencia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="alumno.webmanifest">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="icon" type="image/png" href="icono-192.png">
 <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
+<div class="tbar"><i id="barra"></i></div>
 <main class="wrap">
-  <header class="top">
-    <div class="simbolo" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <div>
-      <p class="marca">PASE DE <b>LISTA</b></p>
-      <h1>¡Hola! Registra tu asistencia</h1>
-    </div>
-  </header>
+  <header class="cab"><b>Asistencia</b><span id="lblFecha"></span></header>
 
   <!-- Paso 1: código -->
-  <section id="pCodigo" class="card oculto">
-    <h2>Código de la clase</h2>
-    <p class="mini">Escanea el QR proyectado o escribe el código de 6 dígitos que aparece debajo de él.</p>
+  <section id="pCodigo" class="oculto">
+    <h1>Registra tu asistencia</h1>
+    <p class="grupo">Escanea el código QR proyectado, o escribe aquí los 6 dígitos que aparecen debajo de él.</p>
+    <label for="inCodigo">Código de la clase</label>
     <input id="inCodigo" class="codigo" inputmode="numeric" maxlength="7" placeholder="000000" autocomplete="off">
     <button id="btnCodigo" class="btn">Continuar</button>
   </section>
 
-  <!-- Paso 2: matrícula y ubicación -->
-  <section id="pRegistro" class="card oculto">
-    <div class="clase">
-      <span id="lblMateria"></span>
-      <strong id="lblGrupo"></strong>
-      <span id="lblPlantel"></span>
-    </div>
-    <div class="tiempo"><div id="barra"></div></div>
-    <p class="mini" id="lblTiempo"></p>
+  <!-- Paso 2: nombre y ubicación -->
+  <section id="pRegistro" class="oculto">
+    <h1 id="lblMateria"></h1>
+    <p class="grupo" id="lblGrupo"></p>
+    <p class="queda" id="lblTiempo"></p>
 
     <label for="inMat">Tu nombre</label>
-    <select id="inMat"><option value="">Selecciona tu nombre…</option></select>
+    <select id="inMat"><option value="">Elige tu nombre</option></select>
 
-    <div id="ubic" class="ubic">
-      <span class="punto"></span><span id="ubicTxt">Obteniendo ubicación…</span>
-      <button id="btnUbic" class="link oculto">Reintentar</button>
+    <div class="renglon">
+      <div class="enc"><span>Tu renglón en la lista</span><span>Hoy</span></div>
+      <div class="ren"><div><span id="renNombre">Aún no eliges tu nombre</span><small id="renNum"></small></div><div class="hueco">sin sello</div></div>
+    </div>
+
+    <div id="ubic" class="ubi">
+      <i></i>
+      <div><span id="ubicTxt">Buscando tu ubicación</span> <button id="btnUbic" class="link oculto">Reintentar</button>
+        <small id="privacidad">Tu ubicación solo se usa en este momento. Se guarda la distancia, no dónde estás.</small></div>
     </div>
 
     <button id="btnRegistrar" class="btn" disabled>Registrarme</button>
   </section>
 
   <!-- Paso 3: confirmación -->
-  <section id="pListo" class="card centro oculto">
-    <div id="sello" class="sello">✓</div>
-    <p class="grande" id="lblEstado"></p>
-    <p id="lblNombre" style="margin:6px 0 0;font-weight:600"></p>
-    <p class="mini" id="lblHora"></p>
-    <p class="mini">Ya puedes cerrar esta página.</p>
+  <section id="pListo" class="oculto">
+    <div id="sello" class="sello"><b id="selloTxt"></b><span id="selloFecha"></span></div>
+    <p class="nombre" id="lblNombre"></p>
+    <p class="grupo" id="lblClase" style="margin-top:4px"></p>
+    <p class="mini oculto" id="lblPrevio">Ya estabas registrado en esta clase; este es tu registro.</p>
+
+    <div id="avance" class="oculto">
+      <label style="margin-top:30px">Tu renglón en la lista</label>
+      <div class="dias" id="dias"></div>
+      <div class="pct"><b id="avPct"></b><span>de asistencia en esta materia</span></div>
+      <p class="pie" id="avDet"></p>
+    </div>
+    <p class="mini" style="margin-top:22px">Ya puedes cerrar esta página.</p>
   </section>
 
-  <p id="error" class="error oculto"></p>
+  <p id="error" class="error oculto" role="alert"></p>
 </main>
 
 <script src="comun.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-let pase = null, vence = 0, total = 180, ubic = null, requiereUbic = true, reloj = null;
+let pase = null, vence = 0, total = 180, ubic = null, requiereUbic = true, reloj = null, CLASE = null, ALUMNOS = [];
+
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const hoy = new Date();
+$('lblFecha').textContent = DIAS[hoy.getDay()] + ' ' + hoy.getDate() + ' de ' + MESES[hoy.getMonth()];
 
 function mostrar(id) { ['pCodigo', 'pRegistro', 'pListo'].forEach(p => $(p).classList.toggle('oculto', p !== id)); }
 function error(m) { $('error').textContent = m || ''; $('error').classList.toggle('oculto', !m); }
+function nombreBonito(n) {
+  return String(n || '').toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase())
+    .replace(/\b(De|Del|La|Las|Los|Y)\b/g, w => w.toLowerCase());
+}
+const pl = (n, uno, varios) => n + ' ' + (n === 1 ? uno : varios);
 
 // Identificador del celular (se guarda en el navegador)
 function dispositivo() {
@@ -82,21 +101,22 @@ const DEV = dispositivo();
 
 async function validar(codigo) {
   error('');
-  $('btnCodigo').disabled = true; $('btnCodigo').textContent = 'Verificando…';
+  $('btnCodigo').disabled = true; $('btnCodigo').textContent = 'Verificando';
   try {
     const r = await api('validarCodigo', { codigo: codigo, dispositivo: DEV });
     pase = r.pase; requiereUbic = r.requiereUbicacion; total = r.vigencia; vence = Date.now() + total * 1000;
-    $('lblMateria').textContent = r.materia;
-    $('lblGrupo').textContent = r.grupo;
-    $('lblPlantel').textContent = r.plantel;
+    CLASE = r; ALUMNOS = r.alumnos || [];
+    $('lblMateria').textContent = r.materia || 'Tu clase';
+    $('lblGrupo').textContent = ['Grupo ' + r.grupo, r.plantel ? 'plantel ' + r.plantel : ''].filter(Boolean).join(', ');
     const previo = leer('asis_mat') || '';
-    $('inMat').innerHTML = '<option value="">Selecciona tu nombre…</option>' +
-      (r.alumnos || []).map(a => '<option value="' + esc(a.id) + '">' + esc(a.nombre) + '</option>').join('');
-    if ((r.alumnos || []).some(a => a.id === previo)) $('inMat').value = previo;
+    $('inMat').innerHTML = '<option value="">Elige tu nombre</option>' +
+      ALUMNOS.map(a => '<option value="' + esc(a.id) + '">' + esc(nombreBonito(a.nombre)) + '</option>').join('');
+    if (ALUMNOS.some(a => a.id === previo)) $('inMat').value = previo;
+    pintarRenglon();
     mostrar('pRegistro');
     iniciarReloj();
     if (requiereUbic) pedirUbicacion();
-    else { $('ubic').className = 'ubic ok'; $('ubicTxt').textContent = 'Esta clase no requiere ubicación.'; listo(); }
+    else { $('ubic').className = 'ubi ok'; $('ubicTxt').textContent = 'Esta clase no pide ubicación'; $('privacidad').classList.add('oculto'); listo(); }
   } catch (e) {
     mostrar('pCodigo'); error(e.message);
   } finally {
@@ -104,14 +124,21 @@ async function validar(codigo) {
   }
 }
 
+function pintarRenglon() {
+  const i = ALUMNOS.findIndex(a => a.id === $('inMat').value);
+  $('renNombre').textContent = i < 0 ? 'Aún no eliges tu nombre' : nombreBonito(ALUMNOS[i].nombre);
+  $('renNum').textContent = i < 0 ? '' : 'n.º ' + (i + 1) + ' de ' + ALUMNOS.length;
+}
+$('inMat').onchange = () => { pintarRenglon(); error(''); };
+
 function iniciarReloj() {
   clearInterval(reloj);
   const paso = () => {
     const s = Math.max(0, Math.round((vence - Date.now()) / 1000));
     $('barra').style.width = (s / total * 100) + '%';
-    $('lblTiempo').textContent = s
-      ? 'Te quedan ' + Math.floor(s / 60) + ':' + pad2(s % 60) + ' para registrarte'
-      : 'Tiempo agotado: vuelve a escanear el código proyectado.';
+    $('lblTiempo').innerHTML = s
+      ? 'Te quedan <b>' + Math.floor(s / 60) + ':' + pad2(s % 60) + '</b> para registrarte'
+      : 'Se acabó el tiempo. Vuelve a escanear el código proyectado.';
     if (!s) { clearInterval(reloj); $('btnRegistrar').disabled = true; }
   };
   paso(); reloj = setInterval(paso, 500);
@@ -119,15 +146,15 @@ function iniciarReloj() {
 
 async function pedirUbicacion() {
   $('btnUbic').classList.add('oculto');
-  $('ubic').className = 'ubic';
-  $('ubicTxt').textContent = 'Obteniendo ubicación…';
+  $('ubic').className = 'ubi';
+  $('ubicTxt').textContent = 'Buscando tu ubicación';
   try {
     ubic = await mejorUbicacion(15000, 35);
-    $('ubic').className = 'ubic ok';
-    $('ubicTxt').textContent = 'Estás en el plantel · ±' + Math.round(ubic.acc) + ' m';
+    $('ubic').className = 'ubi ok';
+    $('ubicTxt').textContent = 'Ubicación lista';
   } catch (e) {
     ubic = null;
-    $('ubic').className = 'ubic mal';
+    $('ubic').className = 'ubi mal';
     $('ubicTxt').textContent = e.message;
     $('btnUbic').classList.remove('oculto');
   }
@@ -135,25 +162,19 @@ async function pedirUbicacion() {
 }
 
 function listo() { $('btnRegistrar').disabled = !(pase && Date.now() < vence && (!requiereUbic || ubic)); }
-
 $('btnUbic').onclick = pedirUbicacion;
 
 $('btnRegistrar').onclick = async () => {
   const m = $('inMat').value.trim();
-  if (!m) { error('Selecciona tu nombre en la lista.'); return; }
+  if (!m) { error('Elige tu nombre en la lista.'); return; }
   error('');
   const b = $('btnRegistrar');
-  b.disabled = true; b.textContent = 'Registrando…';
+  b.disabled = true; b.textContent = 'Registrando';
   try {
     const r = await api('registrar', Object.assign({ pase: pase, matricula: m, dispositivo: DEV }, ubic || {}));
     guardar('asis_mat', m);
-    clearInterval(reloj);
-    const ret = r.estado === 'Retardo';
-    $('sello').className = 'sello' + (ret ? ' ret' : '');
-    $('sello').textContent = ret ? '⏱' : '✓';
-    $('lblEstado').textContent = r.yaRegistrado ? 'Ya estabas registrado' : (ret ? 'Quedaste con retardo' : '¡Listo, ya estás registrado!');
-    $('lblNombre').textContent = r.nombre;
-    $('lblHora').textContent = (r.yaRegistrado ? 'Registro previo: ' : 'Hora: ') + String(r.hora).slice(0, 5) + ' · ' + r.estado;
+    clearInterval(reloj); $('barra').style.width = '0%';
+    pintarListo(r);
     mostrar('pListo');
   } catch (e) {
     error(e.message);
@@ -162,6 +183,39 @@ $('btnRegistrar').onclick = async () => {
     b.textContent = 'Registrarme';
   }
 };
+
+const SELLO = { Asistencia: 'PRESENTE', Retardo: 'RETARDO', Justificada: 'JUSTIFICADA', Falta: 'FALTA' };
+function pintarListo(r) {
+  $('sello').className = 'sello poner' + (r.estado === 'Asistencia' ? '' : ' R');
+  $('selloTxt').textContent = SELLO[r.estado] || String(r.estado).toUpperCase();
+  const hora = String(r.hora || '').slice(0, 5);
+  $('selloFecha').textContent = (hoy.getDate() + ' ' + MESES[hoy.getMonth()].slice(0, 3) + ' ' + hoy.getFullYear()).toUpperCase() + (hora ? '   ' + hora : '');
+  $('lblNombre').textContent = nombreBonito(r.nombre);
+  $('lblClase').textContent = [CLASE.materia, CLASE.grupo].filter(Boolean).join(', ');
+  $('lblPrevio').classList.toggle('oculto', !r.yaRegistrado);
+  pintarAvance(r.avance);
+}
+
+function pintarAvance(a) {
+  if (!a || !a.clases) { $('avance').classList.add('oculto'); return; }
+  const h = a.historial || [], LET = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+  $('dias').innerHTML = h.map((x, i) => {
+    const d = new Date(x.f + 'T12:00:00');
+    const enc = isNaN(d) ? '' : LET[d.getDay()] + '<br>' + d.getDate();
+    return '<div class="' + x.e + (i === h.length - 1 ? ' hoy' : '') + '"><small>' + enc + '</small><b>' + (x.e === 'A' ? '' : x.e) + '</b></div>';
+  }).join('');
+  $('dias').style.maxWidth = (h.length * 46) + 'px';
+  $('avPct').textContent = a.pct + ' %';
+  const presentes = a.asistencias + a.retardos;
+  const partes = [];
+  if (a.retardos) partes.push(pl(a.retardos, 'con retardo', 'con retardo'));
+  if (a.faltas) partes.push(pl(a.faltas, 'falta', 'faltas'));
+  let t = 'Llevas ' + pl(presentes, 'clase', 'clases') + ' de ' + a.clases + (partes.length ? ': ' + partes.join(' y ') : '') + '.';
+  if (a.justificadas) t += ' ' + (a.justificadas === 1 ? 'Tu falta justificada no cuenta.' : 'Tus ' + a.justificadas + ' faltas justificadas no cuentan.');
+  if (a.minimo) t += ' El mínimo es ' + a.minimo + ' %.';
+  $('avDet').textContent = t;
+  $('avance').classList.remove('oculto');
+}
 
 $('btnCodigo').onclick = () => validar($('inCodigo').value);
 $('inCodigo').addEventListener('keydown', e => { if (e.key === 'Enter') validar($('inCodigo').value); });
